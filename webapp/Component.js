@@ -34,7 +34,17 @@ sap.ui.define([
         },
 
         _getUserInfo: function() {
-            // Get user info from IAS (SAP BTP User API)
+            // HARDCODED USER FOR TESTING - Remove after IAS integration
+            var oAppModel = this.getModel("app");
+            oAppModel.setProperty("/userId", "10000");
+            oAppModel.setProperty("/userInfo", { 
+                name: "Usuario Test",
+                email: "test@ccb.org.co"
+            });
+            
+            console.log("✅ Usuario hardcodeado para testing: 10000");
+            
+            /* COMENTADO TEMPORALMENTE - Descomentar después de configurar IAS
             var that = this;
             
             // Try to get user info from the SAP BTP user API
@@ -63,6 +73,7 @@ sap.ui.define([
                 oAppModel.setProperty("/userId", "10000");
                 oAppModel.setProperty("/userInfo", { name: "Usuario Demo" });
             });
+            */
         }
     });
 });
