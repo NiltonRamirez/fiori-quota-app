@@ -144,34 +144,39 @@ sap.ui.define([
          * @private
          */
         _handleResponse: function(response) {
-            var contentType = response.headers.get("content-type");
-            
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                return response.json().then(function(data) {
-                    if (!response.ok) {
-                        // Check if it's a business error (like no children)
-                        if (data.error) {
-                            return Promise.reject({
-                                businessError: true,
-                                error: data.error
-                            });
-                        }
-                        return Promise.reject({
-                            status: response.status,
-                            message: data.message || "Error en la solicitud"
-                        });
-                    }
-                    return data;
-                });
-            } else {
-                if (!response.ok) {
+            // Always try to parse as JSON first since our backend returns JSON
+            return response.text().then(function(text) {
+                console.log("📦 Raw response text:", text);
+                
+                var data;
+                try {
+                    data = JSON.parse(text);
+                    console.log("✅ Parsed JSON data:", data);
+                } catch (e) {
+                    console.error("❌ Failed to parse JSON:", e);
+                    console.error("Raw text:", text);
                     return Promise.reject({
                         status: response.status,
-                        message: "Error en la solicitud"
+                        message: "Error parsing JSON response"
                     });
                 }
-                return response.text();
-            }
+                
+                if (!response.ok) {
+                    // Check if it's a business error (like no children)
+                    if (data.error) {
+                        return Promise.reject({
+                            businessError: true,
+                            error: data.error
+                        });
+                    }
+                    return Promise.reject({
+                        status: response.status,
+                        message: data.message || "Error en la solicitud"
+                    });
+                }
+                
+                return data;
+            });
         }
     });
 });
