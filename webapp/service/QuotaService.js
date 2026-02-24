@@ -16,6 +16,11 @@ sap.ui.define([
          * @returns {Promise} Promise with the response
          */
         getQuotaOverview: function(sUserId, sWeekStartDate) {
+            console.log("📡 Calling getQuotaOverview with:", {
+                userId: sUserId,
+                weekStartDate: sWeekStartDate,
+                url: this._sBaseUrl + "/api/quota/overview"
+            });
             return this._callService("/api/quota/overview", "POST", {
                 "x-user-id": sUserId,
                 "weekStartDate": sWeekStartDate
@@ -74,6 +79,12 @@ sap.ui.define([
          */
         _callService: function(sEndpoint, sMethod, oData) {
             var sUrl = this._sBaseUrl + sEndpoint;
+            
+            console.log("🌐 Fetch Request:", {
+                url: sUrl,
+                method: sMethod,
+                data: oData
+            });
 
             return fetch(sUrl, {
                 method: sMethod,
@@ -82,7 +93,18 @@ sap.ui.define([
                 },
                 body: JSON.stringify(oData)
             })
-            .then(this._handleResponse.bind(this));
+            .then(function(response) {
+                console.log("📥 Fetch Response:", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                return this._handleResponse(response);
+            }.bind(this))
+            .catch(function(error) {
+                console.error("❌ Fetch Error:", error);
+                throw error;
+            });
         },
 
         /**
