@@ -18,10 +18,9 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertError: false
+        ignoreCertError: true
         backend:
           - path: /destinations
-            url: http://localhost:5000
             destination: dest_int_s
     - name: fiori-tools-appreload
       afterMiddleware: compression
