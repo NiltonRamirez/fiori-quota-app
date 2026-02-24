@@ -41,11 +41,27 @@ sap.ui.define([
             oSunday.setDate(oMonday.getDate() + 6);
 
             var oViewModel = this.getView().getModel();
-            oViewModel.setProperty("/currentWeekStart", oMonday.toISOString());
+            // Format date as YYYY-MM-DDTHH:mm:ss.SSS (without Z)
+            var sWeekStart = this._formatDateForBackend(oMonday);
+            oViewModel.setProperty("/currentWeekStart", sWeekStart);
             
             // Format week label
             var sWeekLabel = this._formatWeekLabel(oMonday, oSunday);
             oViewModel.setProperty("/currentWeekLabel", sWeekLabel);
+        },
+
+        _formatDateForBackend: function(oDate) {
+            // Format: YYYY-MM-DDTHH:mm:ss.SSS (without Z timezone)
+            var year = oDate.getFullYear();
+            var month = String(oDate.getMonth() + 1).padStart(2, '0');
+            var day = String(oDate.getDate()).padStart(2, '0');
+            var hours = String(oDate.getHours()).padStart(2, '0');
+            var minutes = String(oDate.getMinutes()).padStart(2, '0');
+            var seconds = String(oDate.getSeconds()).padStart(2, '0');
+            var milliseconds = String(oDate.getMilliseconds()).padStart(3, '0');
+            
+            return year + '-' + month + '-' + day + 'T' + 
+                   hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
         },
 
         _formatWeekLabel: function(oStart, oEnd) {
