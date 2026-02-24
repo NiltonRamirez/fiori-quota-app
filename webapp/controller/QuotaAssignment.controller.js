@@ -91,11 +91,15 @@ sap.ui.define([
             var oQuotaService = this.getOwnerComponent().getQuotaService();
             oQuotaService.getQuotaOverview(sUserId, sWeekStartDate)
                 .then(function(oData) {
+                    console.log("✅ Service Response Data:", oData);
+                    
                     oView.setBusy(false);
                     oViewModel.setProperty("/busy", false);
                     
                     // Process children data
                     if (oData.children && oData.children.length > 0) {
+                        console.log("✅ Processing", oData.children.length, "children");
+                        
                         // Initialize selected property for each day
                         oData.children.forEach(function(oChild) {
                             oChild.days.forEach(function(oDay) {
@@ -106,6 +110,14 @@ sap.ui.define([
                         oViewModel.setProperty("/hasChildren", true);
                         oViewModel.setProperty("/children", oData.children);
                         oViewModel.setProperty("/employeeId", oData.employeeId);
+                        
+                        console.log("✅ Data set in model. HasChildren:", oViewModel.getProperty("/hasChildren"));
+                        console.log("✅ Children count:", oViewModel.getProperty("/children").length);
+                    } else {
+                        console.log("⚠️ No children found in response");
+                        oViewModel.setProperty("/hasChildren", false);
+                        oViewModel.setProperty("/children", []);
+                        oViewModel.setProperty("/noChildrenMessage", "No hay hijos registrados o no hay cupos disponibles para esta semana");
                     }
                 }.bind(this))
                 .catch(function(oError) {
