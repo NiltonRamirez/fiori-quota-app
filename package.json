@@ -1,0 +1,45 @@
+{
+  "name": "fiori-quota-app",
+  "version": "1.0.0",
+  "description": "SAP Fiori app for quota management",
+  "main": "index.js",
+  "scripts": {
+    "start": "ui5 serve --port 8080 --open index.html",
+    "build": "ui5 build --clean-dest --dest dist",
+    "deploy": "npm run build && cf push",
+    "deploy:mta": "mbt build -t ./mta_archives && cf deploy mta_archives/fiori-quota-app_1.0.0.mtar",
+    "lint": "eslint webapp/",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "mock": "node mock-server.js",
+    "dev": "concurrently \"npm run mock\" \"npm start\"",
+    "clean": "rm -rf node_modules dist mta_archives .build target"
+  },
+  "keywords": [
+    "sapui5",
+    "fiori",
+    "sap btp",
+    "quota management",
+    "guarderia"
+  ],
+  "author": "Cámara de Comercio de Bogotá",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "@ui5/cli": "^3.0.0",
+    "@sap/ux-ui5-tooling": "^1.0.0",
+    "eslint": "^8.0.0"
+  },
+  "ui5": {
+    "dependencies": [
+      "@sap/ux-ui5-tooling"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

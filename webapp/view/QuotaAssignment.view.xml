@@ -1,0 +1,158 @@
+<mvc:View
+    controllerName="com.ccb.quota.controller.QuotaAssignment"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core">
+    
+    <Page
+        id="quotaAssignmentPage"
+        title="{i18n>quotaAssignmentTitle}"
+        showNavButton="false">
+        
+        <headerContent>
+            <Button
+                id="myAssignmentsButton"
+                icon="sap-icon://calendar"
+                text="{i18n>myAssignments}"
+                press=".onNavigateToMyAssignments" />
+            <Button
+                id="refreshButton"
+                icon="sap-icon://refresh"
+                press=".onRefresh" />
+        </headerContent>
+
+        <content>
+            <VBox class="sapUiSmallMargin">
+                
+                <!-- Week Selection -->
+                <l:HorizontalLayout class="sapUiSmallMarginBottom">
+                    <Button
+                        icon="sap-icon://navigation-left-arrow"
+                        press=".onPreviousWeek"
+                        tooltip="{i18n>previousWeek}" />
+                    <Title
+                        text="{/currentWeekLabel}"
+                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                        level="H3" />
+                    <Button
+                        icon="sap-icon://navigation-right-arrow"
+                        press=".onNextWeek"
+                        tooltip="{i18n>nextWeek}" />
+                </l:HorizontalLayout>
+
+                <!-- Info Message for No Children -->
+                <MessageStrip
+                    visible="{= !${/hasChildren}}"
+                    text="{/noChildrenMessage}"
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiMediumMarginBottom">
+                </MessageStrip>
+
+                <!-- Children List -->
+                <VBox visible="{= ${/hasChildren}}">
+                    <List
+                        id="childrenList"
+                        items="{/children}"
+                        noDataText="{i18n>noChildren}">
+                        <items>
+                            <CustomListItem>
+                                <VBox class="sapUiSmallMargin">
+                                    <Title
+                                        text="{fullName}"
+                                        level="H4"
+                                        class="sapUiTinyMarginBottom" />
+                                    
+                                    <!-- Days Selection -->
+                                    <l:Grid
+                                        defaultSpan="L2 M3 S6"
+                                        class="quotaDaysGrid">
+                                        <VBox
+                                            items="{days}"
+                                            class="quotaDayBox">
+                                            <items>
+                                                <VBox
+                                                    class="{
+                                                        parts: ['available', 'alreadyAssigned', 'disabledReason'],
+                                                        formatter: '.formatter.getDayBoxClass'
+                                                    }">
+                                                    <layoutData>
+                                                        <FlexItemData growFactor="1" />
+                                                    </layoutData>
+                                                    
+                                                    <CheckBox
+                                                        selected="{selected}"
+                                                        enabled="{
+                                                            parts: ['available', 'alreadyAssigned', 'disabledReason'],
+                                                            formatter: '.formatter.isDaySelectable'
+                                                        }"
+                                                        select=".onDaySelected"
+                                                        text="{
+                                                            parts: ['date', 'dayOfWeek'],
+                                                            formatter: '.formatter.formatDayLabel'
+                                                        }"
+                                                        class="quotaDayCheckBox" />
+                                                    
+                                                    <Text
+                                                        text="{
+                                                            parts: ['remainingQuota', 'available', 'alreadyAssigned', 'disabledReason'],
+                                                            formatter: '.formatter.formatQuotaStatus'
+                                                        }"
+                                                        class="{
+                                                            parts: ['remainingQuota', 'available', 'disabledReason'],
+                                                            formatter: '.formatter.getQuotaStatusClass'
+                                                        }" />
+                                                    
+                                                    <core:Icon
+                                                        src="{
+                                                            parts: ['alreadyAssigned', 'disabledReason'],
+                                                            formatter: '.formatter.getStatusIcon'
+                                                        }"
+                                                        color="{
+                                                            parts: ['alreadyAssigned', 'disabledReason'],
+                                                            formatter: '.formatter.getStatusColor'
+                                                        }"
+                                                        visible="{
+                                                            parts: ['alreadyAssigned', 'disabledReason'],
+                                                            formatter: '.formatter.hasStatusIcon'
+                                                        }"
+                                                        class="sapUiTinyMarginTop" />
+                                                </VBox>
+                                            </items>
+                                        </VBox>
+                                    </l:Grid>
+                                </VBox>
+                            </CustomListItem>
+                        </items>
+                    </List>
+                </VBox>
+
+                <!-- Action Buttons -->
+                <Toolbar visible="{= ${/hasChildren}}">
+                    <ToolbarSpacer />
+                    <Button
+                        id="checkAllButton"
+                        text="{i18n>selectAll}"
+                        press=".onSelectAll"
+                        type="Emphasized" />
+                    <Button
+                        id="saveButton"
+                        text="{i18n>saveAssignments}"
+                        press=".onSaveAssignments"
+                        type="Accept"
+                        enabled="{= ${/selectedCount} > 0}" />
+                </Toolbar>
+
+            </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Text text="{i18n>selectedDaysCount}: {/selectedCount}" />
+            </Toolbar>
+        </footer>
+
+    </Page>
+</mvc:View>

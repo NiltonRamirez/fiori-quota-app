@@ -1,0 +1,108 @@
+_schema-version: '3.1'
+ID: fiori-quota-app
+version: 1.0.0
+description: "Gestión de Cupos - SAP Fiori Application"
+parameters:
+  enable-parallel-deployments: true
+  deploy_mode: html5-repo
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npm run build
+
+modules:
+  - name: fiori-quota-app-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: fiori-quota-app-destination-service
+        parameters:
+          content-target: true
+      - name: fiori-quota-app-repo-host
+        parameters:
+          service-key:
+            name: fiori-quota-app-repo-host-key
+      - name: fiori-quota-app-xsuaa
+        parameters:
+          service-key:
+            name: fiori-quota-app-xsuaa-key
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Name: fiori_quota_app_html5_repo_host
+              ServiceInstanceName: fiori-quota-app-html5-srv
+              ServiceKeyName: fiori-quota-app-repo-host-key
+              sap.cloud.service: fiori.quota.app
+            - Authentication: OAuth2UserTokenExchange
+              Name: fiori_quota_app_xsuaa
+              ServiceInstanceName: fiori-quota-app-xsuaa
+              ServiceKeyName: fiori-quota-app-xsuaa-key
+              sap.cloud.service: fiori.quota.app
+          existing_destinations_policy: update
+
+  - name: fiori-quota-app-app-content
+    type: com.sap.application.content
+    path: .
+    requires:
+      - name: fiori-quota-app-repo-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: dist
+      requires:
+        - artifacts:
+            - comccbquota.zip
+          name: comccbquota
+          target-path: dist/
+
+  - name: comccbquota
+    type: html5
+    path: webapp
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build
+      supported-platforms: []
+
+resources:
+  - name: fiori-quota-app-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+              - Name: dest_int_s
+                Description: Destination to Integration Suite
+                Type: HTTP
+                ProxyType: Internet
+                URL: https://ccb-is-dev-5v6vds1v.it-cpi034-rt.cfapps.us10-002.hana.ondemand.com
+                Authentication: OAuth2ClientCredentials
+                tokenServiceURL: https://ccb-is-dev-5v6vds1v.authentication.us10.hana.ondemand.com/oauth/token
+                clientId: sb-929514f2-7649-4f9b-9d7a-33c735214f2d!b514001|it-rt-ccb-is-dev-5v6vds1v!b410334
+                clientSecret: ((dest_int_s_client_secret))
+            existing_destinations_policy: update
+        version: 1.0.0
+      service: destination
+      service-name: fiori-quota-app-destination-service
+      service-plan: lite
+
+  - name: fiori-quota-app-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: fiori-quota-app-xsuaa
+      service-plan: application
+
+  - name: fiori-quota-app-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: fiori-quota-app-html5-srv
+      service-plan: app-host

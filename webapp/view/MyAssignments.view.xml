@@ -1,0 +1,126 @@
+<mvc:View
+    controllerName="com.ccb.quota.controller.MyAssignments"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core">
+    
+    <Page
+        id="myAssignmentsPage"
+        title="{i18n>myAssignmentsTitle}"
+        showNavButton="true"
+        navButtonPress=".onNavBack">
+        
+        <headerContent>
+            <Button
+                id="refreshAssignmentsButton"
+                icon="sap-icon://refresh"
+                press=".onRefresh" />
+        </headerContent>
+
+        <content>
+            <VBox class="sapUiSmallMargin">
+                
+                <!-- Week Selection -->
+                <l:HorizontalLayout class="sapUiSmallMarginBottom">
+                    <Button
+                        icon="sap-icon://navigation-left-arrow"
+                        press=".onPreviousWeek"
+                        tooltip="{i18n>previousWeek}" />
+                    <Title
+                        text="{/currentWeekLabel}"
+                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                        level="H3" />
+                    <Button
+                        icon="sap-icon://navigation-right-arrow"
+                        press=".onNextWeek"
+                        tooltip="{i18n>nextWeek}" />
+                </l:HorizontalLayout>
+
+                <!-- Info Message when no assignments -->
+                <MessageStrip
+                    visible="{= ${/assignments}.length === 0}"
+                    text="{i18n>noAssignments}"
+                    type="Information"
+                    showIcon="true"
+                    class="sapUiMediumMarginBottom">
+                </MessageStrip>
+
+                <!-- Assignments Table -->
+                <Table
+                    id="assignmentsTable"
+                    items="{/assignments}"
+                    mode="MultiSelect"
+                    growing="true"
+                    growingThreshold="20"
+                    sticky="ColumnHeaders"
+                    visible="{= ${/assignments}.length > 0}">
+                    
+                    <headerToolbar>
+                        <OverflowToolbar>
+                            <Title text="{i18n>assignmentsList}" level="H4" />
+                            <ToolbarSpacer />
+                            <Button
+                                text="{i18n>cancelSelected}"
+                                type="Reject"
+                                press=".onCancelSelected"
+                                enabled="{= ${/selectedForCancellation}.length > 0}" />
+                        </OverflowToolbar>
+                    </headerToolbar>
+
+                    <columns>
+                        <Column width="12em">
+                            <Text text="{i18n>date}" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true">
+                            <Text text="{i18n>dayOfWeek}" />
+                        </Column>
+                        <Column minScreenWidth="Desktop" demandPopin="true" hAlign="Begin">
+                            <Text text="{i18n>childName}" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
+                            <Text text="{i18n>status}" />
+                        </Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem type="Active">
+                            <cells>
+                                <ObjectIdentifier
+                                    title="{
+                                        path: 'date',
+                                        formatter: '.formatter.formatDate'
+                                    }"
+                                    text="{dependentId}" />
+                                <Text
+                                    text="{
+                                        path: 'dayOfWeek',
+                                        formatter: '.formatter.formatDayOfWeek'
+                                    }" />
+                                <Text text="{childName}" />
+                                <ObjectStatus
+                                    text="{
+                                        path: 'assignmentStatus',
+                                        formatter: '.formatter.formatAssignmentStatus'
+                                    }"
+                                    state="{
+                                        path: 'assignmentStatus',
+                                        formatter: '.formatter.getAssignmentStatusState'
+                                    }" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+            </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Text text="{i18n>totalAssignments}: {/assignments/length}" />
+            </Toolbar>
+        </footer>
+
+    </Page>
+</mvc:View>

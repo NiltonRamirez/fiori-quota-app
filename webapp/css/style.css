@@ -1,0 +1,176 @@
+/* Custom styles for Quota Management App */
+
+/* Day Box Styles */
+.quotaDayBox {
+    padding: 0.5rem;
+    margin: 0.25rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d9d9d9;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.quotaDayBox:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quotaDayAvailable {
+    border-color: #0a6ed1;
+    background-color: #f5faff;
+}
+
+.quotaDayDisabled {
+    background-color: #f5f5f5;
+    opacity: 0.7;
+}
+
+.quotaDayAssigned {
+    border-color: #107e3e;
+    background-color: #f1fdf6;
+}
+
+.quotaDayWaitingList {
+    border-color: #e78c07;
+    background-color: #fff8f1;
+}
+
+/* Quota Status Styles */
+.quotaStatusSuccess {
+    color: #107e3e;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.quotaStatusWarning {
+    color: #e78c07;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.quotaStatusError {
+    color: #b00;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* CheckBox in Day Box */
+.quotaDayCheckBox {
+    margin-bottom: 0.25rem;
+}
+
+.quotaDayCheckBox .sapMCb {
+    font-weight: 500;
+}
+
+/* Grid Layout for Days */
+.quotaDaysGrid {
+    width: 100%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .quotaDayBox {
+        padding: 0.375rem;
+        margin: 0.125rem;
+    }
+}
+
+/* Table Styles */
+.sapMList .sapMLIB {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Message Strip Spacing */
+.sapMMsgStrip {
+    margin-bottom: 1rem;
+}
+
+/* Title Spacing */
+.sapMTitle {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Toolbar Enhancements */
+.sapMTB {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Icon Enhancements */
+.sapUiIcon {
+    font-size: 1.25rem;
+}
+
+/* Busy Indicator Overlay */
+.sapUiLocalBusyIndicator {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Table Selection */
+.sapMListTblRow.sapMLIBSelected {
+    background-color: #e5f0fa;
+}
+
+/* Object Status in Table */
+.sapMObjectStatus {
+    font-weight: 600;
+}
+
+/* Button Spacing */
+.sapMBtn {
+    margin: 0 0.25rem;
+}
+
+/* Page Content Padding */
+.sapMPage .sapMPageEnableScrolling {
+    padding: 1rem;
+}
+
+/* VBox Spacing */
+.sapUiVBox {
+    gap: 0.5rem;
+}
+
+/* Custom Classes for Multi-select behavior */
+.quotaDayBox.selected {
+    border-width: 2px;
+    border-color: #0a6ed1;
+}
+
+/* Animation for status changes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quotaDayBox {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Focus States */
+.quotaDayCheckBox .sapMCb:focus {
+    outline: 2px solid #0a6ed1;
+    outline-offset: 2px;
+}
+
+/* Disabled State */
+.quotaDayBox.quotaDayDisabled .sapMCb {
+    opacity: 0.5;
+}
+
+/* Compact Mode Adjustments */
+.sapUiSizeCompact .quotaDayBox {
+    padding: 0.375rem;
+}
+
+.sapUiSizeCompact .quotaStatusSuccess,
+.sapUiSizeCompact .quotaStatusWarning,
+.sapUiSizeCompact .quotaStatusError {
+    font-size: 0.75rem;
+}

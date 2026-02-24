@@ -1,0 +1,25 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/destinations/dest_int_s/(.*)$",
+      "target": "$1",
+      "destination": "dest_int_s",
+      "authenticationType": "none",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/services/userapi/(.*)$",
+      "target": "/services/userapi/$1",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }
+  ]
+}

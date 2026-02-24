@@ -1,0 +1,35 @@
+{
+  "xsappname": "fiori-quota-app",
+  "tenant-mode": "dedicated",
+  "description": "Security profile for Fiori Quota App",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.User",
+      "description": "User access to quota management"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "QuotaUser",
+      "description": "Regular user with access to quota management",
+      "scope-references": [
+        "$XSAPPNAME.User"
+      ]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "QuotaManagementUser",
+      "description": "Users who can manage their quotas",
+      "role-template-references": [
+        "$XSAPPNAME.QuotaUser"
+      ]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.us10-002.hana.ondemand.com/**",
+      "https://*.hana.ondemand.com/**"
+    ]
+  }
+}

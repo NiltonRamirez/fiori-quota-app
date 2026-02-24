@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+mta_archives/
+.build/
+target/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SAP specific
+fioriHtmlRunner.html
+.*/fioriHtmlRunner.html
+mock_preview_sapui5.html
+.*/mock_preview_sapui5.html
+extended_runnable_file.html
+.*/extended_runnable_file.html
+visual_ext_index.html
+/webapp/visual_ext_index.html
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Package manager
+package-lock.json
+yarn.lock
+
+# Temporary files
+tmp/
+temp/
