@@ -92,6 +92,11 @@ sap.ui.define([
             oQuotaService.getQuotaOverview(sUserId, sWeekStartDate)
                 .then(function(oData) {
                     console.log("✅ Service Response Data:", oData);
+                    console.log("🔍 Type of oData:", typeof oData);
+                    console.log("🔍 oData.children exists:", !!oData.children);
+                    console.log("🔍 oData.children type:", typeof oData.children);
+                    console.log("🔍 oData.children length:", oData.children ? oData.children.length : "undefined");
+                    console.log("🔍 Is Array:", Array.isArray(oData.children));
                     
                     oView.setBusy(false);
                     oViewModel.setProperty("/busy", false);
@@ -115,6 +120,8 @@ sap.ui.define([
                         console.log("✅ Children count:", oViewModel.getProperty("/children").length);
                     } else {
                         console.log("⚠️ No children found in response");
+                        console.log("🔍 Condition check - oData.children:", oData.children);
+                        console.log("🔍 Condition check - length:", oData.children ? oData.children.length : "N/A");
                         oViewModel.setProperty("/hasChildren", false);
                         oViewModel.setProperty("/children", []);
                         oViewModel.setProperty("/noChildrenMessage", "No hay hijos registrados o no hay cupos disponibles para esta semana");
