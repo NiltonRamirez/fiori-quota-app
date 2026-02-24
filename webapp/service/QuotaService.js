@@ -6,12 +6,14 @@ sap.ui.define([
     return BaseObject.extend("com.ccb.quota.service.QuotaService", {
         
         constructor: function () {
-            this._sBaseUrl = "/destinations/dest_int_s/http";
+            // Base URL para el destination configurado en BTP
+            this._sBaseUrl = "/destinations/dest_int_s";
         },
 
         /**
          * Get quota overview for the week
-         * @param {string} sUserId - User ID
+         * Endpoint: POST /http/api/quota/overview
+         * @param {string} sUserId - User ID (x-user-id en body)
          * @param {string} sWeekStartDate - Week start date in ISO format
          * @returns {Promise} Promise with the response
          */
@@ -19,9 +21,9 @@ sap.ui.define([
             console.log("📡 Calling getQuotaOverview with:", {
                 userId: sUserId,
                 weekStartDate: sWeekStartDate,
-                url: this._sBaseUrl + "/api/quota/overview"
+                url: this._sBaseUrl + "/http/api/quota/overview"
             });
-            return this._callService("/api/quota/overview", "POST", {
+            return this._callService("/http/api/quota/overview", "POST", {
                 "x-user-id": sUserId,
                 "weekStartDate": sWeekStartDate
             });
@@ -29,12 +31,18 @@ sap.ui.define([
 
         /**
          * Save assignments
+         * Endpoint: POST /http/saveAssignments
          * @param {string} sEmployeeId - Employee ID
          * @param {Array} aAssignments - Array of assignments
          * @returns {Promise} Promise with the response
          */
         saveAssignments: function(sEmployeeId, aAssignments) {
-            return this._callService("/saveAssignments", "POST", {
+            console.log("📡 Calling saveAssignments with:", {
+                employeeId: sEmployeeId,
+                assignmentsCount: aAssignments.length,
+                url: this._sBaseUrl + "/http/saveAssignments"
+            });
+            return this._callService("/http/saveAssignments", "POST", {
                 "employeeId": sEmployeeId,
                 "assignments": aAssignments
             });
@@ -42,14 +50,21 @@ sap.ui.define([
 
         /**
          * Get my assignments
+         * Endpoint: GET /http/myAssignments?employeeId={id}&weekStartDate={date}
          * @param {string} sEmployeeId - Employee ID
          * @param {string} sWeekStartDate - Week start date in ISO format
          * @returns {Promise} Promise with the response
          */
         getMyAssignments: function(sEmployeeId, sWeekStartDate) {
-            var sUrl = this._sBaseUrl + "/myAssignments?employeeId=" + 
+            var sUrl = this._sBaseUrl + "/http/myAssignments?employeeId=" + 
                        encodeURIComponent(sEmployeeId) + 
                        "&weekStartDate=" + encodeURIComponent(sWeekStartDate);
+            
+            console.log("📡 Calling getMyAssignments with:", {
+                employeeId: sEmployeeId,
+                weekStartDate: sWeekStartDate,
+                url: sUrl
+            });
             
             return fetch(sUrl, {
                 method: "GET",
@@ -57,17 +72,34 @@ sap.ui.define([
                     "Content-Type": "application/json"
                 }
             })
-            .then(this._handleResponse.bind(this));
+            .then(function(response) {
+                console.log("📥 Fetch Response (myAssignments):", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                return this._handleResponse(response);
+            }.bind(this))
+            .catch(function(error) {
+                console.error("❌ Fetch Error (myAssignments):", error);
+                throw error;
+            });
         },
 
         /**
          * Cancel assignments
+         * Endpoint: POST /http/cancelAssignments
          * @param {string} sEmployeeId - Employee ID
          * @param {Array} aCancellations - Array of cancellations
          * @returns {Promise} Promise with the response
          */
         cancelAssignments: function(sEmployeeId, aCancellations) {
-            return this._callService("/cancelAssignments", "POST", {
+            console.log("📡 Calling cancelAssignments with:", {
+                employeeId: sEmployeeId,
+                cancellationsCount: aCancellations.length,
+                url: this._sBaseUrl + "/http/cancelAssignments"
+            });
+            return this._callService("/http/cancelAssignments", "POST", {
                 "employeeId": sEmployeeId,
                 "cancellations": aCancellations
             });
