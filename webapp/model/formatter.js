@@ -3,6 +3,17 @@ sap.ui.define([
 ], function (DateFormat) {
     "use strict";
 
+    // Day names mapping
+    var DAY_NAMES = {
+        "MONDAY": "Lunes",
+        "TUESDAY": "Martes",
+        "WEDNESDAY": "Miércoles",
+        "THURSDAY": "Jueves",
+        "FRIDAY": "Viernes",
+        "SATURDAY": "Sábado",
+        "SUNDAY": "Domingo"
+    };
+
     return {
         /**
          * Format day label
@@ -15,7 +26,7 @@ sap.ui.define([
             var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM"
             });
-            var sDayName = this._getDayName(sDayOfWeek);
+            var sDayName = DAY_NAMES[sDayOfWeek] || sDayOfWeek;
             return sDayName + " " + oDateFormat.format(oDate);
         },
 
@@ -149,7 +160,7 @@ sap.ui.define([
          * Format day of week
          */
         formatDayOfWeek: function(sDayOfWeek) {
-            return this._getDayName(sDayOfWeek);
+            return DAY_NAMES[sDayOfWeek] || sDayOfWeek;
         },
 
         /**
@@ -182,23 +193,6 @@ sap.ui.define([
                 default:
                     return "None";
             }
-        },
-
-        /**
-         * Get day name in Spanish
-         * @private
-         */
-        _getDayName: function(sDayOfWeek) {
-            var mDayNames = {
-                "MONDAY": "Lunes",
-                "TUESDAY": "Martes",
-                "WEDNESDAY": "Miércoles",
-                "THURSDAY": "Jueves",
-                "FRIDAY": "Viernes",
-                "SATURDAY": "Sábado",
-                "SUNDAY": "Domingo"
-            };
-            return mDayNames[sDayOfWeek] || sDayOfWeek;
         }
     };
 });
