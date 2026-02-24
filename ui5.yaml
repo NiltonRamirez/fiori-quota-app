@@ -19,8 +19,14 @@ server:
       afterMiddleware: compression
       configuration:
         ignoreCertError: true
+        ui5:
+          path:
+            - /resources
+            - /test-resources
+          url: https://ui5.sap.com
         backend:
           - path: /destinations
+            url: https://355b165ctrial.us10cf.trial.applicationstudio.cloud.sap
             destination: dest_int_s
     - name: fiori-tools-appreload
       afterMiddleware: compression
