@@ -12,14 +12,13 @@
     {
       "source": "^/services/userapi/(.*)$",
       "target": "/services/userapi/$1",
-      "authenticationType": "xsuaa",
+      "authenticationType": "none",
       "csrfProtection": false
     },
     {
       "source": "^(.*)$",
       "target": "$1",
-      "service": "html5-apps-repo-rt",
-      "authenticationType": "xsuaa"
+      "authenticationType": "none"
     }
   ]
 }
