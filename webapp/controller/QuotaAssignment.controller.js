@@ -112,9 +112,23 @@ sap.ui.define([
                             });
                         });
 
+                        // Prepare weekDays for table headers (5 days: Monday-Friday)
+                        var aWeekDays = [];
+                        if (oData.children[0] && oData.children[0].days) {
+                            for (var i = 0; i < Math.min(5, oData.children[0].days.length); i++) {
+                                var oDay = oData.children[0].days[i];
+                                aWeekDays.push({
+                                    dayOfWeek: oDay.dayOfWeek,
+                                    date: oDay.date,
+                                    quotaText: oDay.remainingQuota + " cupos disponibles"
+                                });
+                            }
+                        }
+
                         oViewModel.setProperty("/hasChildren", true);
                         oViewModel.setProperty("/children", oData.children);
                         oViewModel.setProperty("/employeeId", oData.employeeId);
+                        oViewModel.setProperty("/weekDays", aWeekDays);
                         
                         console.log("✅ Data set in model. HasChildren:", oViewModel.getProperty("/hasChildren"));
                         console.log("✅ Children count:", oViewModel.getProperty("/children").length);
@@ -166,6 +180,42 @@ sap.ui.define([
             }
 
             this._updateSelectedCount();
+        },
+
+        onDaySelectedInTable: function(oEvent) {
+            var oCheckBox = oEvent.getSource();
+            var bSelected = oCheckBox.getSelected();
+            
+            // Get the binding context and day index from custom data
+            var oContext = oCheckBox.getBindingContext();
+            var iDayIndex = parseInt(oCheckBox.data("dayIndex"), 10);
+            
+            if (oContext) {
+                // Get the child object path
+                var sPath = oContext.getPath();
+                // Update the selected property for the specific day
+                var oViewModel = this.getView().getModel();
+                oViewModel.setProperty(sPath + "/days/" + iDayIndex + "/selected", bSelected);
+                
+                this._updateSelectedCount();
+            }
+        },
+
+        onCancel: function() {
+            // Clear all selections
+            var oViewModel = this.getView().getModel();
+            var aChildren = oViewModel.getProperty("/children") || [];
+
+            aChildren.forEach(function(oChild) {
+                oChild.days.forEach(function(oDay) {
+                    oDay.selected = false;
+                });
+            });
+
+            oViewModel.setProperty("/children", aChildren);
+            this._updateSelectedCount();
+            
+            MessageToast.show("Selecciones canceladas");
         },
 
         _updateSelectedCount: function() {

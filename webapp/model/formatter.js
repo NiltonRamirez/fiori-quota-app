@@ -104,6 +104,18 @@ sap.ui.define([
         },
 
         /**
+         * Check if day is selectable (simplified for table view)
+         */
+        isDaySelectableSimple: function(bAvailable, bAlreadyAssigned) {
+            // Already assigned - cannot select
+            if (bAlreadyAssigned) {
+                return false;
+            }
+            // Available - can select
+            return bAvailable;
+        },
+
+        /**
          * Get status icon
          */
         getStatusIcon: function(bAlreadyAssigned, sDisabledReason) {
@@ -119,7 +131,7 @@ sap.ui.define([
             if (sDisabledReason === "NO_QUOTA") {
                 return "sap-icon://attendance";
             }
-            return "";
+            return null;
         },
 
         /**
@@ -127,12 +139,12 @@ sap.ui.define([
          */
         getStatusColor: function(bAlreadyAssigned, sDisabledReason) {
             if (bAlreadyAssigned) {
-                return "green";
+                return "#107e3e";
             }
             if (sDisabledReason) {
-                return "orange";
+                return "#e78c07";
             }
-            return "default";
+            return null;
         },
 
         /**

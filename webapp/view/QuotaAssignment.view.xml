@@ -23,22 +23,24 @@
         </headerContent>
 
         <content>
-            <VBox class="sapUiSmallMargin">
+            <VBox class="sapUiSmallMargin quotaContentContainer">
                 
                 <!-- Week Selection -->
-                <l:HorizontalLayout class="sapUiSmallMarginBottom">
+                <l:HorizontalLayout class="sapUiSmallMarginBottom quotaWeekSelector">
                     <Button
                         icon="sap-icon://navigation-left-arrow"
                         press=".onPreviousWeek"
-                        tooltip="{i18n>previousWeek}" />
+                        tooltip="{i18n>previousWeek}"
+                        type="Transparent" />
                     <Title
                         text="{/currentWeekLabel}"
                         class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
-                        level="H3" />
+                        level="H4" />
                     <Button
                         icon="sap-icon://navigation-right-arrow"
                         press=".onNextWeek"
-                        tooltip="{i18n>nextWeek}" />
+                        tooltip="{i18n>nextWeek}"
+                        type="Transparent" />
                 </l:HorizontalLayout>
 
                 <!-- Info Message for No Children -->
@@ -50,109 +52,189 @@
                     class="sapUiMediumMarginBottom">
                 </MessageStrip>
 
-                <!-- Children List -->
-                <VBox visible="{= ${/hasChildren}}">
-                    <List
-                        id="childrenList"
-                        items="{/children}"
-                        noDataText="{i18n>noChildren}">
-                        <items>
-                            <CustomListItem>
-                                <VBox class="sapUiSmallMargin">
-                                    <Title
-                                        text="{fullName}"
-                                        level="H4"
-                                        class="sapUiTinyMarginBottom" />
-                                    
-                                    <!-- Days Selection -->
-                                    <l:Grid
-                                        defaultSpan="L2 M3 S6"
-                                        class="quotaDaysGrid">
-                                        <VBox
-                                            items="{days}"
-                                            class="quotaDayBox">
-                                            <items>
-                                                <VBox
-                                                    class="{
-                                                        parts: ['available', 'alreadyAssigned', 'disabledReason'],
-                                                        formatter: '.formatter.getDayBoxClass'
-                                                    }">
-                                                    <layoutData>
-                                                        <FlexItemData growFactor="1" />
-                                                    </layoutData>
-                                                    
-                                                    <CheckBox
-                                                        selected="{selected}"
-                                                        enabled="{
-                                                            parts: ['available', 'alreadyAssigned', 'disabledReason'],
-                                                            formatter: '.formatter.isDaySelectable'
-                                                        }"
-                                                        select=".onDaySelected"
-                                                        text="{
-                                                            parts: ['date', 'dayOfWeek'],
-                                                            formatter: '.formatter.formatDayLabel'
-                                                        }"
-                                                        class="quotaDayCheckBox" />
-                                                    
-                                                    <Text
-                                                        text="{
-                                                            parts: ['remainingQuota', 'available', 'alreadyAssigned', 'disabledReason'],
-                                                            formatter: '.formatter.formatQuotaStatus'
-                                                        }"
-                                                        class="{
-                                                            parts: ['remainingQuota', 'available', 'disabledReason'],
-                                                            formatter: '.formatter.getQuotaStatusClass'
-                                                        }" />
-                                                    
-                                                    <core:Icon
-                                                        src="{
-                                                            parts: ['alreadyAssigned', 'disabledReason'],
-                                                            formatter: '.formatter.getStatusIcon'
-                                                        }"
-                                                        color="{
-                                                            parts: ['alreadyAssigned', 'disabledReason'],
-                                                            formatter: '.formatter.getStatusColor'
-                                                        }"
-                                                        visible="{
-                                                            parts: ['alreadyAssigned', 'disabledReason'],
-                                                            formatter: '.formatter.hasStatusIcon'
-                                                        }"
-                                                        class="sapUiTinyMarginTop" />
-                                                </VBox>
-                                            </items>
-                                        </VBox>
-                                    </l:Grid>
+                <!-- Info Text -->
+                <Text
+                    visible="{= ${/hasChildren}}"
+                    text="Seleccione los días de la semana para los cuales requiere el cupo."
+                    class="quotaInfoText sapUiSmallMarginBottom" />
+
+                <!-- Quota Table -->
+                <Table
+                    id="quotaTable"
+                    visible="{= ${/hasChildren}}"
+                    items="{/children}"
+                    mode="None"
+                    class="quotaTable sapUiSmallMarginTop">
+                    <columns>
+                        <Column width="15rem" hAlign="Begin">
+                            <header>
+                                <Label text="NOMBRES Y APELLIDOS" class="quotaTableHeader" />
+                            </header>
+                        </Column>
+                        <Column width="auto" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+                            <header>
+                                <VBox alignItems="Center" class="quotaDayColumn">
+                                    <Label text="LUNES" class="quotaDayLabel" />
+                                    <Text text="{/weekDays/0/quotaText}" class="quotaCuposText" />
                                 </VBox>
-                            </CustomListItem>
-                        </items>
-                    </List>
+                            </header>
+                        </Column>
+                        <Column width="auto" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+                            <header>
+                                <VBox alignItems="Center" class="quotaDayColumn">
+                                    <Label text="MARTES" class="quotaDayLabel" />
+                                    <Text text="{/weekDays/1/quotaText}" class="quotaCuposText" />
+                                </VBox>
+                            </header>
+                        </Column>
+                        <Column width="auto" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+                            <header>
+                                <VBox alignItems="Center" class="quotaDayColumn">
+                                    <Label text="MIÉRCOLES" class="quotaDayLabel" />
+                                    <Text text="{/weekDays/2/quotaText}" class="quotaCuposText" />
+                                </VBox>
+                            </header>
+                        </Column>
+                        <Column width="auto" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+                            <header>
+                                <VBox alignItems="Center" class="quotaDayColumn">
+                                    <Label text="JUEVES" class="quotaDayLabel" />
+                                    <Text text="{/weekDays/3/quotaText}" class="quotaCuposText" />
+                                </VBox>
+                            </header>
+                        </Column>
+                        <Column width="auto" hAlign="Center" minScreenWidth="Tablet" demandPopin="false">
+                            <header>
+                                <VBox alignItems="Center" class="quotaDayColumn">
+                                    <Label text="VIERNES" class="quotaDayLabel" />
+                                    <Text text="{/weekDays/4/quotaText}" class="quotaCuposText" />
+                                </VBox>
+                            </header>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <!-- Name Cell -->
+                                <Text text="{fullName}" class="quotaNameText" />
+                                
+                                <!-- Monday -->
+                                <VBox alignItems="Center" justifyContent="Center">
+                                    <CheckBox
+                                        selected="{days/0/selected}"
+                                        enabled="{
+                                            parts: ['days/0/available', 'days/0/alreadyAssigned'],
+                                            formatter: '.formatter.isDaySelectableSimple'
+                                        }"
+                                        select=".onDaySelectedInTable"
+                                        class="quotaDayCheckbox">
+                                        <customData>
+                                            <core:CustomData key="dayIndex" value="0" />
+                                        </customData>
+                                    </CheckBox>
+                                </VBox>
+                                
+                                <!-- Tuesday -->
+                                <VBox alignItems="Center" justifyContent="Center">
+                                    <CheckBox
+                                        selected="{days/1/selected}"
+                                        enabled="{
+                                            parts: ['days/1/available', 'days/1/alreadyAssigned'],
+                                            formatter: '.formatter.isDaySelectableSimple'
+                                        }"
+                                        select=".onDaySelectedInTable"
+                                        class="quotaDayCheckbox">
+                                        <customData>
+                                            <core:CustomData key="dayIndex" value="1" />
+                                        </customData>
+                                    </CheckBox>
+                                </VBox>
+                                
+                                <!-- Wednesday -->
+                                <VBox alignItems="Center" justifyContent="Center">
+                                    <CheckBox
+                                        selected="{days/2/selected}"
+                                        enabled="{
+                                            parts: ['days/2/available', 'days/2/alreadyAssigned'],
+                                            formatter: '.formatter.isDaySelectableSimple'
+                                        }"
+                                        select=".onDaySelectedInTable"
+                                        class="quotaDayCheckbox">
+                                        <customData>
+                                            <core:CustomData key="dayIndex" value="2" />
+                                        </customData>
+                                    </CheckBox>
+                                </VBox>
+                                
+                                <!-- Thursday -->
+                                <VBox alignItems="Center" justifyContent="Center">
+                                    <CheckBox
+                                        selected="{days/3/selected}"
+                                        enabled="{
+                                            parts: ['days/3/available', 'days/3/alreadyAssigned'],
+                                            formatter: '.formatter.isDaySelectableSimple'
+                                        }"
+                                        select=".onDaySelectedInTable"
+                                        class="quotaDayCheckbox">
+                                        <customData>
+                                            <core:CustomData key="dayIndex" value="3" />
+                                        </customData>
+                                    </CheckBox>
+                                </VBox>
+                                
+                                <!-- Friday -->
+                                <VBox alignItems="Center" justifyContent="Center">
+                                    <CheckBox
+                                        selected="{days/4/selected}"
+                                        enabled="{
+                                            parts: ['days/4/available', 'days/4/alreadyAssigned'],
+                                            formatter: '.formatter.isDaySelectableSimple'
+                                        }"
+                                        select=".onDaySelectedInTable"
+                                        class="quotaDayCheckbox">
+                                        <customData>
+                                            <core:CustomData key="dayIndex" value="4" />
+                                        </customData>
+                                    </CheckBox>
+                                </VBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <!-- Checkboxes for Terms -->
+                <VBox visible="{= ${/hasChildren}}" class="quotaTermsContainer sapUiMediumMarginTop">
+                    <CheckBox
+                        id="termsCheckbox"
+                        text="Acepto las condiciones y lineamientos del servicio"
+                        class="quotaTermsCheckbox" />
+                    <CheckBox
+                        id="privacyCheckbox"
+                        text="Acepto la política de tratamiento de datos personales"
+                        class="quotaPrivacyCheckbox" />
                 </VBox>
 
                 <!-- Action Buttons -->
-                <Toolbar visible="{= ${/hasChildren}}">
-                    <ToolbarSpacer />
+                <HBox
+                    visible="{= ${/hasChildren}}"
+                    justifyContent="End"
+                    class="quotaActionButtons sapUiMediumMarginTop">
                     <Button
-                        id="checkAllButton"
-                        text="{i18n>selectAll}"
-                        press=".onSelectAll"
-                        type="Emphasized" />
+                        id="cancelButton"
+                        text="Cancelar"
+                        press=".onCancel"
+                        type="Default"
+                        class="sapUiSmallMarginEnd" />
                     <Button
                         id="saveButton"
-                        text="{i18n>saveAssignments}"
+                        text="Aceptar"
                         press=".onSaveAssignments"
-                        type="Accept"
+                        type="Emphasized"
                         enabled="{= ${/selectedCount} > 0}" />
-                </Toolbar>
+                </HBox>
 
             </VBox>
         </content>
-
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Text text="{i18n>selectedDaysCount}: {/selectedCount}" />
-            </Toolbar>
-        </footer>
 
     </Page>
 </mvc:View>

@@ -1,83 +1,200 @@
-/* Custom styles for Quota Management App */
+/* Custom styles for Quota Management App - Table Layout */
 
-/* Day Box Styles */
-.quotaDayBox {
-    padding: 0.5rem;
-    margin: 0.25rem;
-    border-radius: 0.375rem;
+/* Main Container */
+.quotaContentContainer {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Week Selector */
+.quotaWeekSelector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.quotaWeekSelector .sapMBtn {
+    margin: 0 0.5rem;
+}
+
+/* Info Text */
+.quotaInfoText {
+    font-size: 0.875rem;
+    color: #32363a;
+    line-height: 1.5;
+}
+
+/* Quota Table */
+.quotaTable {
     border: 1px solid #d9d9d9;
-    background-color: #ffffff;
-    transition: all 0.2s ease;
+    border-radius: 0.25rem;
 }
 
-.quotaDayBox:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.quotaTable .sapMListTbl {
+    border: none;
 }
 
-.quotaDayAvailable {
-    border-color: #0a6ed1;
-    background-color: #f5faff;
+.quotaTable thead {
+    background-color: #f7f7f7;
 }
 
-.quotaDayDisabled {
-    background-color: #f5f5f5;
-    opacity: 0.7;
-}
-
-.quotaDayAssigned {
-    border-color: #107e3e;
-    background-color: #f1fdf6;
-}
-
-.quotaDayWaitingList {
-    border-color: #e78c07;
-    background-color: #fff8f1;
-}
-
-/* Quota Status Styles */
-.quotaStatusSuccess {
-    color: #107e3e;
+.quotaTable .sapMListTblHeaderCell {
+    padding: 1rem 0.5rem;
+    border-bottom: 2px solid #d9d9d9;
     font-weight: 600;
-    font-size: 0.875rem;
 }
 
-.quotaStatusWarning {
-    color: #e78c07;
+.quotaTable .sapMListTblCell {
+    padding: 1.25rem 0.5rem;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: middle;
+}
+
+/* Table Headers */
+.quotaTableHeader {
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    color: #32363a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.quotaStatusError {
-    color: #b00;
+.quotaDayColumn {
+    padding: 0.5rem;
+}
+
+.quotaDayLabel {
     font-weight: 600;
-    font-size: 0.875rem;
-}
-
-/* CheckBox in Day Box */
-.quotaDayCheckBox {
+    font-size: 0.75rem;
+    color: #32363a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-bottom: 0.25rem;
 }
 
-.quotaDayCheckBox .sapMCb {
-    font-weight: 500;
+.quotaCuposText {
+    font-size: 0.75rem;
+    color: #6a6d70;
+    font-weight: 400;
 }
 
-/* Grid Layout for Days */
-.quotaDaysGrid {
-    width: 100%;
+/* Name Cell */
+.quotaNameText {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #32363a;
+}
+
+/* Day Checkboxes */
+.quotaDayCheckbox {
+    margin: 0;
+}
+
+.quotaDayCheckbox .sapMCb {
+    display: flex;
+    justify-content: center;
+}
+
+.quotaDayCheckbox .sapMCbBg {
+    border: 2px solid #89919a;
+    border-radius: 0.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.quotaDayCheckbox .sapMCb:hover .sapMCbBg {
+    border-color: #0a6ed1;
+}
+
+.quotaDayCheckbox .sapMCb.sapMCbMarkChecked .sapMCbBg {
+    background-color: #0a6ed1;
+    border-color: #0a6ed1;
+}
+
+/* Terms Checkboxes */
+.quotaTermsContainer {
+    padding: 1.5rem;
+    background-color: #f7f7f7;
+    border-radius: 0.25rem;
+    border: 1px solid #e5e5e5;
+}
+
+.quotaTermsCheckbox,
+.quotaPrivacyCheckbox {
+    margin: 0.5rem 0;
+}
+
+.quotaTermsCheckbox .sapMCbLabel,
+.quotaPrivacyCheckbox .sapMCbLabel {
+    font-size: 0.875rem;
+    color: #32363a;
+}
+
+/* Action Buttons */
+.quotaActionButtons {
+    padding: 1rem 0;
+}
+
+.quotaActionButtons .sapMBtn {
+    min-width: 8rem;
+}
+
+/* Emphasized Button (Aceptar) */
+.quotaActionButtons .sapMBtnEmphasized {
+    background-color: #0a6ed1;
+    border-color: #0a6ed1;
+    color: #ffffff;
+}
+
+.quotaActionButtons .sapMBtnEmphasized:hover {
+    background-color: #085caf;
+    border-color: #085caf;
+}
+
+/* Default Button (Cancelar) */
+.quotaActionButtons .sapMBtnDefault {
+    background-color: transparent;
+    border-color: #89919a;
+    color: #32363a;
+}
+
+.quotaActionButtons .sapMBtnDefault:hover {
+    background-color: #f7f7f7;
+    border-color: #6a6d70;
+}
+
+/* Disabled State */
+.quotaDayCheckbox .sapMCbRo .sapMCbBg {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* Responsive Adjustments */
-@media (max-width: 600px) {
-    .quotaDayBox {
-        padding: 0.375rem;
-        margin: 0.125rem;
+@media (max-width: 1024px) {
+    .quotaContentContainer {
+        padding: 1rem;
+    }
+    
+    .quotaTable .sapMListTblCell {
+        padding: 1rem 0.25rem;
     }
 }
 
-/* Table Styles */
-.sapMList .sapMLIB {
-    border-bottom: 1px solid #e5e5e5;
+@media (max-width: 768px) {
+    .quotaDayLabel {
+        font-size: 0.7rem;
+    }
+    
+    .quotaCuposText {
+        font-size: 0.7rem;
+    }
+    
+    .quotaNameText {
+        font-size: 0.8rem;
+    }
 }
 
 /* Message Strip Spacing */
@@ -85,63 +202,16 @@
     margin-bottom: 1rem;
 }
 
-/* Title Spacing */
-.sapMTitle {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Toolbar Enhancements */
-.sapMTB {
-    border-bottom: 1px solid #e5e5e5;
-}
-
-/* Icon Enhancements */
-.sapUiIcon {
-    font-size: 1.25rem;
-}
-
-/* Busy Indicator Overlay */
+/* Busy Indicator */
 .sapUiLocalBusyIndicator {
     background-color: rgba(255, 255, 255, 0.8);
 }
 
-/* Table Selection */
-.sapMListTblRow.sapMLIBSelected {
-    background-color: #e5f0fa;
-}
-
-/* Object Status in Table */
-.sapMObjectStatus {
-    font-weight: 600;
-}
-
-/* Button Spacing */
-.sapMBtn {
-    margin: 0 0.25rem;
-}
-
-/* Page Content Padding */
-.sapMPage .sapMPageEnableScrolling {
-    padding: 1rem;
-}
-
-/* VBox Spacing */
-.sapUiVBox {
-    gap: 0.5rem;
-}
-
-/* Custom Classes for Multi-select behavior */
-.quotaDayBox.selected {
-    border-width: 2px;
-    border-color: #0a6ed1;
-}
-
-/* Animation for status changes */
+/* Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-5px);
     }
     to {
         opacity: 1;
@@ -149,28 +219,17 @@
     }
 }
 
-.quotaDayBox {
+.quotaTable {
     animation: fadeIn 0.3s ease-in-out;
 }
 
 /* Focus States */
-.quotaDayCheckBox .sapMCb:focus {
+.quotaDayCheckbox .sapMCb:focus .sapMCbBg {
     outline: 2px solid #0a6ed1;
     outline-offset: 2px;
 }
 
-/* Disabled State */
-.quotaDayBox.quotaDayDisabled .sapMCb {
-    opacity: 0.5;
-}
-
-/* Compact Mode Adjustments */
-.sapUiSizeCompact .quotaDayBox {
-    padding: 0.375rem;
-}
-
-.sapUiSizeCompact .quotaStatusSuccess,
-.sapUiSizeCompact .quotaStatusWarning,
-.sapUiSizeCompact .quotaStatusError {
-    font-size: 0.75rem;
+/* Hover Effects */
+.quotaTable .sapMListTblRow:hover {
+    background-color: #f9f9f9;
 }
