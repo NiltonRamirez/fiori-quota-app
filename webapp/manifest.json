@@ -34,6 +34,12 @@
   },
   "sap.ui5": {
     "flexEnabled": true,
+    "rootView": {
+      "viewName": "com.ccb.quota.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "appView"
+    },
     "dependencies": {
       "minUI5Version": "1.120.0",
       "libs": {
