@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
-    "com/ccb/quota/model/formatter"
-], function (Controller, JSONModel, MessageBox, MessageToast, formatter) {
+    "com/ccb/quota/model/formatter",
+    "sap/ui/core/format/DateFormat"
+], function (Controller, JSONModel, MessageBox, MessageToast, formatter, DateFormat) {
     "use strict";
 
     return Controller.extend("com.ccb.quota.controller.MyAssignments", {
@@ -48,7 +49,7 @@ sap.ui.define([
         },
 
         _formatWeekLabel: function(oStart, oEnd) {
-            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+            var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM/yyyy"
             });
             return "Semana del " + oDateFormat.format(oStart) + " al " + oDateFormat.format(oEnd);

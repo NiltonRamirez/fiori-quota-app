@@ -1,4 +1,6 @@
-sap.ui.define([], function () {
+sap.ui.define([
+    "sap/ui/core/format/DateFormat"
+], function (DateFormat) {
     "use strict";
 
     return {
@@ -10,7 +12,7 @@ sap.ui.define([], function () {
                 return "";
             }
             var oDate = new Date(sDate);
-            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+            var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM"
             });
             var sDayName = this._getDayName(sDayOfWeek);
@@ -137,7 +139,7 @@ sap.ui.define([], function () {
                 return "";
             }
             var oDate = new Date(sDate);
-            var oDateFormat = sap.ui.core.format.DateFormat.getDateInstance({
+            var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM/yyyy"
             });
             return oDateFormat.format(oDate);
