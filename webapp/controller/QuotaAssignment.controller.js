@@ -24,11 +24,24 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel);
 
-            // Set initial week to current week
-            this._setCurrentWeek(new Date());
+            // Set week based on current day (next week if Friday)
+            this._setCurrentOrNextWeek();
             
             // Load quota overview
             this._loadQuotaOverview();
+        },
+
+        _setCurrentOrNextWeek: function() {
+            var oToday = new Date();
+            var dayOfWeek = oToday.getDay();
+            
+            // If Friday (5), show next week
+            if (dayOfWeek === 5) {
+                // Add 3 days to get to Monday of next week
+                oToday.setDate(oToday.getDate() + 3);
+            }
+            
+            this._setCurrentWeek(oToday);
         },
 
         _setCurrentWeek: function(oDate) {
@@ -340,22 +353,16 @@ sap.ui.define([
             MessageToast.show("Actualizando información...");
         },
 
-        onPreviousWeek: function() {
-            var oViewModel = this.getView().getModel();
-            var sCurrentWeek = oViewModel.getProperty("/currentWeekStart");
-            var oDate = new Date(sCurrentWeek);
-            oDate.setDate(oDate.getDate() - 7);
-            this._setCurrentWeek(oDate);
-            this._loadQuotaOverview();
+        onOpenTermsAndConditions: function() {
+            // Open terms and conditions document from BTP destination
+            var sUrl = "/destinations/DOC_CONDICIONES/http";
+            window.open(sUrl, "_blank", "noopener,noreferrer");
         },
 
-        onNextWeek: function() {
-            var oViewModel = this.getView().getModel();
-            var sCurrentWeek = oViewModel.getProperty("/currentWeekStart");
-            var oDate = new Date(sCurrentWeek);
-            oDate.setDate(oDate.getDate() + 7);
-            this._setCurrentWeek(oDate);
-            this._loadQuotaOverview();
+        onOpenPrivacyPolicy: function() {
+            // Open privacy policy document from BTP destination
+            var sUrl = "/destinations/DOC_POLITICAS/http";
+            window.open(sUrl, "_blank", "noopener,noreferrer");
         },
 
         onNavigateToMyAssignments: function() {

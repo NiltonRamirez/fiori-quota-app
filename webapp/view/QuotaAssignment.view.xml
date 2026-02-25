@@ -25,22 +25,12 @@
         <content>
             <VBox class="sapUiSmallMargin quotaContentContainer">
                 
-                <!-- Week Selection -->
+                <!-- Week Selection (Fixed to current/next week) -->
                 <l:HorizontalLayout class="sapUiSmallMarginBottom quotaWeekSelector">
-                    <Button
-                        icon="sap-icon://navigation-left-arrow"
-                        press=".onPreviousWeek"
-                        tooltip="{i18n>previousWeek}"
-                        type="Transparent" />
                     <Title
                         text="{/currentWeekLabel}"
-                        class="sapUiSmallMarginBegin sapUiSmallMarginEnd"
+                        class="quotaWeekTitle"
                         level="H4" />
-                    <Button
-                        icon="sap-icon://navigation-right-arrow"
-                        press=".onNextWeek"
-                        tooltip="{i18n>nextWeek}"
-                        type="Transparent" />
                 </l:HorizontalLayout>
 
                 <!-- Info Message for No Children -->
@@ -204,14 +194,27 @@
 
                 <!-- Checkboxes for Terms -->
                 <VBox visible="{= ${/hasChildren}}" class="quotaTermsContainer sapUiMediumMarginTop">
-                    <CheckBox
-                        id="termsCheckbox"
-                        text="Acepto las condiciones y lineamientos del servicio"
-                        class="quotaTermsCheckbox" />
-                    <CheckBox
-                        id="privacyCheckbox"
-                        text="Acepto la política de tratamiento de datos personales"
-                        class="quotaPrivacyCheckbox" />
+                    <HBox alignItems="Center" class="quotaTermsRow">
+                        <CheckBox
+                            id="termsCheckbox"
+                            class="quotaTermsCheckbox" />
+                        <Text text="Acepto las " class="quotaTermsText" />
+                        <Link
+                            text="condiciones y lineamientos"
+                            press=".onOpenTermsAndConditions"
+                            class="quotaTermsLink" />
+                        <Text text=" del servicio" class="quotaTermsText" />
+                    </HBox>
+                    <HBox alignItems="Center" class="quotaTermsRow">
+                        <CheckBox
+                            id="privacyCheckbox"
+                            class="quotaTermsCheckbox" />
+                        <Text text="Acepto la " class="quotaTermsText" />
+                        <Link
+                            text="política de tratamiento de datos personales"
+                            press=".onOpenPrivacyPolicy"
+                            class="quotaTermsLink" />
+                    </HBox>
                 </VBox>
 
                 <!-- Action Buttons -->

@@ -1,13 +1,14 @@
 /* Custom styles for Quota Management App - Table Layout */
 
-/* Main Container */
+/* Main Container - Centered with max width */
 .quotaContentContainer {
     padding: 1.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 0 auto !important;
+    width: 100%;
 }
 
-/* Week Selector */
+/* Week Selector - Centered */
 .quotaWeekSelector {
     display: flex;
     align-items: center;
@@ -16,8 +17,11 @@
     border-bottom: 1px solid #e5e5e5;
 }
 
-.quotaWeekSelector .sapMBtn {
-    margin: 0 0.5rem;
+.quotaWeekTitle {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #32363a;
 }
 
 /* Info Text */
@@ -25,16 +29,20 @@
     font-size: 0.875rem;
     color: #32363a;
     line-height: 1.5;
+    text-align: center;
 }
 
-/* Quota Table */
+/* Quota Table - Responsive */
 .quotaTable {
     border: 1px solid #d9d9d9;
     border-radius: 0.25rem;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .quotaTable .sapMListTbl {
     border: none;
+    min-width: 800px; /* Minimum width for all columns to fit */
 }
 
 .quotaTable thead {
@@ -45,6 +53,7 @@
     padding: 1rem 0.5rem;
     border-bottom: 2px solid #d9d9d9;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .quotaTable .sapMListTblCell {
@@ -120,17 +129,34 @@
     background-color: #f7f7f7;
     border-radius: 0.25rem;
     border: 1px solid #e5e5e5;
+    max-width: 100%;
 }
 
-.quotaTermsCheckbox,
-.quotaPrivacyCheckbox {
+.quotaTermsRow {
     margin: 0.5rem 0;
+    flex-wrap: wrap;
 }
 
-.quotaTermsCheckbox .sapMCbLabel,
-.quotaPrivacyCheckbox .sapMCbLabel {
+.quotaTermsCheckbox {
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+.quotaTermsText {
     font-size: 0.875rem;
     color: #32363a;
+    margin: 0 0.2rem;
+}
+
+.quotaTermsLink {
+    font-size: 0.875rem;
+    color: #0a6ed1;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.quotaTermsLink:hover {
+    color: #085caf;
 }
 
 /* Action Buttons */
@@ -176,14 +202,23 @@
 @media (max-width: 1024px) {
     .quotaContentContainer {
         padding: 1rem;
+        max-width: 100%;
     }
     
     .quotaTable .sapMListTblCell {
         padding: 1rem 0.25rem;
     }
+    
+    .quotaTable .sapMListTbl {
+        min-width: 700px;
+    }
 }
 
 @media (max-width: 768px) {
+    .quotaContentContainer {
+        padding: 0.5rem;
+    }
+    
     .quotaDayLabel {
         font-size: 0.7rem;
     }
@@ -194,6 +229,19 @@
     
     .quotaNameText {
         font-size: 0.8rem;
+    }
+    
+    .quotaTable .sapMListTbl {
+        min-width: 600px;
+    }
+    
+    .quotaTermsText,
+    .quotaTermsLink {
+        font-size: 0.8rem;
+    }
+    
+    .quotaActionButtons .sapMBtn {
+        min-width: 6rem;
     }
 }
 
