@@ -32,7 +32,13 @@ sap.ui.define([
             if (!sDate) {
                 return "";
             }
-            var oDate = new Date(sDate);
+            // Parse date as local date to avoid timezone issues
+            var aDateParts = sDate.split("T")[0].split("-");
+            var oDate = new Date(
+                parseInt(aDateParts[0]), 
+                parseInt(aDateParts[1]) - 1, 
+                parseInt(aDateParts[2])
+            );
             var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM"
             });
@@ -171,7 +177,14 @@ sap.ui.define([
             if (!sDate) {
                 return "";
             }
-            var oDate = new Date(sDate);
+            // Parse date as local date to avoid timezone issues
+            // Input format: "2026-02-24" or "2026-02-24T..."
+            var aDateParts = sDate.split("T")[0].split("-");
+            var oDate = new Date(
+                parseInt(aDateParts[0]), 
+                parseInt(aDateParts[1]) - 1, 
+                parseInt(aDateParts[2])
+            );
             var oDateFormat = DateFormat.getDateInstance({
                 pattern: "dd/MM/yyyy"
             });
