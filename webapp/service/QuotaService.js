@@ -23,25 +23,31 @@ sap.ui.define([
                 return Promise.resolve(this._sCsrfToken);
             }
 
-            // Fetch CSRF token with HEAD request
-            var sUrl = this._sBaseUrl + "/http/api/quota/overview";
+            // Fetch CSRF token with GET request (some backends don't support HEAD)
+            var sUrl = this._sBaseUrl + "/http/cancelAssignments";
             
             console.log("🔐 Fetching CSRF Token from:", sUrl);
             
             return fetch(sUrl, {
-                method: "HEAD",
+                method: "GET",
                 headers: {
                     "X-CSRF-Token": "Fetch"
                 }
             })
             .then(function(response) {
+                console.log("📥 Token Fetch Response:", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
                 var sToken = response.headers.get("X-CSRF-Token");
                 if (sToken) {
-                    console.log("✅ CSRF Token obtained");
+                    console.log("✅ CSRF Token obtained:", sToken.substring(0, 20) + "...");
                     this._sCsrfToken = sToken;
                     return sToken;
                 } else {
-                    console.log("⚠️ No CSRF Token returned, proceeding without it");
+                    console.log("⚠️ No CSRF Token in response headers, proceeding without it");
                     return null;
                 }
             }.bind(this))
