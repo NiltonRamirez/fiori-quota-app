@@ -8,6 +8,48 @@ sap.ui.define([
         constructor: function () {
             // Base URL para el destination configurado en BTP
             this._sBaseUrl = "/destinations/dest_int_s";
+            // CSRF Token for POST requests
+            this._sCsrfToken = null;
+        },
+
+        /**
+         * Fetch CSRF Token from backend
+         * @private
+         * @returns {Promise} Promise with CSRF token
+         */
+        _fetchCsrfToken: function() {
+            // If we already have a token, return it
+            if (this._sCsrfToken) {
+                return Promise.resolve(this._sCsrfToken);
+            }
+
+            // Fetch CSRF token with HEAD request
+            var sUrl = this._sBaseUrl + "/http/api/quota/overview";
+            
+            console.log("🔐 Fetching CSRF Token from:", sUrl);
+            
+            return fetch(sUrl, {
+                method: "HEAD",
+                headers: {
+                    "X-CSRF-Token": "Fetch"
+                }
+            })
+            .then(function(response) {
+                var sToken = response.headers.get("X-CSRF-Token");
+                if (sToken) {
+                    console.log("✅ CSRF Token obtained");
+                    this._sCsrfToken = sToken;
+                    return sToken;
+                } else {
+                    console.log("⚠️ No CSRF Token returned, proceeding without it");
+                    return null;
+                }
+            }.bind(this))
+            .catch(function(error) {
+                console.error("❌ Error fetching CSRF Token:", error);
+                // Continue without token
+                return null;
+            });
         },
 
         /**
@@ -56,34 +98,17 @@ sap.ui.define([
          * @returns {Promise} Promise with the response
          */
         getMyAssignments: function(sEmployeeId, sWeekStartDate) {
-            var sUrl = this._sBaseUrl + "/http/myAssignments?employeeId=" + 
-                       encodeURIComponent(sEmployeeId) + 
-                       "&weekStartDate=" + encodeURIComponent(sWeekStartDate);
+            var sEndpoint = "/http/myAssignments?employeeId=" + 
+                            encodeURIComponent(sEmployeeId) + 
+                            "&weekStartDate=" + encodeURIComponent(sWeekStartDate);
             
             console.log("📡 Calling getMyAssignments with:", {
                 employeeId: sEmployeeId,
                 weekStartDate: sWeekStartDate,
-                url: sUrl
+                endpoint: sEndpoint
             });
             
-            return fetch(sUrl, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(function(response) {
-                console.log("📥 Fetch Response (myAssignments):", {
-                    status: response.status,
-                    statusText: response.statusText,
-                    ok: response.ok
-                });
-                return this._handleResponse(response);
-            }.bind(this))
-            .catch(function(error) {
-                console.error("❌ Fetch Error (myAssignments):", error);
-                throw error;
-            });
+            return this._callService(sEndpoint, "GET");
         },
 
         /**
@@ -118,25 +143,65 @@ sap.ui.define([
                 data: oData
             });
 
-            return fetch(sUrl, {
-                method: sMethod,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(oData)
-            })
-            .then(function(response) {
-                console.log("📥 Fetch Response:", {
-                    status: response.status,
-                    statusText: response.statusText,
-                    ok: response.ok
+            // For POST, PUT, DELETE methods, fetch CSRF token first
+            if (sMethod === "POST" || sMethod === "PUT" || sMethod === "DELETE") {
+                return this._fetchCsrfToken().then(function(sToken) {
+                    var oHeaders = {
+                        "Content-Type": "application/json"
+                    };
+                    
+                    // Add CSRF token if available
+                    if (sToken) {
+                        oHeaders["X-CSRF-Token"] = sToken;
+                        console.log("🔐 Including CSRF Token in request");
+                    }
+
+                    return fetch(sUrl, {
+                        method: sMethod,
+                        headers: oHeaders,
+                        body: JSON.stringify(oData)
+                    })
+                    .then(function(response) {
+                        console.log("📥 Fetch Response:", {
+                            status: response.status,
+                            statusText: response.statusText,
+                            ok: response.ok
+                        });
+                        
+                        // If 403, token might be expired, reset it
+                        if (response.status === 403) {
+                            console.log("⚠️ 403 Forbidden - resetting CSRF token");
+                            this._sCsrfToken = null;
+                        }
+                        
+                        return this._handleResponse(response);
+                    }.bind(this))
+                    .catch(function(error) {
+                        console.error("❌ Fetch Error:", error);
+                        throw error;
+                    });
+                }.bind(this));
+            } else {
+                // For GET requests, no CSRF token needed
+                return fetch(sUrl, {
+                    method: sMethod,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(function(response) {
+                    console.log("📥 Fetch Response:", {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok
+                    });
+                    return this._handleResponse(response);
+                }.bind(this))
+                .catch(function(error) {
+                    console.error("❌ Fetch Error:", error);
+                    throw error;
                 });
-                return this._handleResponse(response);
-            }.bind(this))
-            .catch(function(error) {
-                console.error("❌ Fetch Error:", error);
-                throw error;
-            });
+            }
         },
 
         /**
