@@ -16,17 +16,29 @@ sap.ui.define([
             var oViewModel = new JSONModel({
                 busy: false,
                 assignments: [],
-                selectedForCancellation: [],
                 currentWeekStart: null,
                 currentWeekLabel: ""
             });
             this.getView().setModel(oViewModel);
 
-            // Set initial week to current week
-            this._setCurrentWeek(new Date());
+            // Set week based on current day (next week if Friday)
+            this._setCurrentOrNextWeek();
             
             // Load assignments
             this._loadAssignments();
+        },
+
+        _setCurrentOrNextWeek: function() {
+            var oToday = new Date();
+            var dayOfWeek = oToday.getDay();
+            
+            // If Friday (5), show next week
+            if (dayOfWeek === 5) {
+                // Add 3 days to get to Monday of next week
+                oToday.setDate(oToday.getDate() + 3);
+            }
+            
+            this._setCurrentWeek(oToday);
         },
 
         _setCurrentWeek: function(oDate) {
@@ -89,11 +101,16 @@ sap.ui.define([
             var oQuotaService = this.getOwnerComponent().getQuotaService();
             oQuotaService.getMyAssignments(sUserId, sWeekStartDate)
                 .then(function(oData) {
+                    console.log("✅ Assignments Response:", oData);
+                    console.log("🔍 Type of oData:", typeof oData);
+                    console.log("🔍 oData.results:", oData.results);
+                    
                     oView.setBusy(false);
                     oViewModel.setProperty("/busy", false);
                     
-                    // Process assignments data
-                    var aAssignments = oData.assignments || [];
+                    // Process assignments data - backend returns 'results' not 'assignments'
+                    var aAssignments = oData.results || [];
+                    console.log("✅ Assignments array length:", aAssignments.length);
                     oViewModel.setProperty("/assignments", aAssignments);
                     oViewModel.setProperty("/employeeId", sUserId);
                 }.bind(this))
@@ -148,35 +165,76 @@ sap.ui.define([
         _performCancellation: function(aCancellations) {
             var oView = this.getView();
             var oViewModel = oView.getModel();
-            var sEmployeeId = oViewModel.getProperty("/employeeId");
+            var sUserId = oViewModel.getProperty("/employeeId");
 
             oView.setBusy(true);
 
             var oQuotaService = this.getOwnerComponent().getQuotaService();
-            oQuotaService.cancelAssignments(sEmployeeId, aCancellations)
+            oQuotaService.cancelAssignments(sUserId, aCancellations)
                 .then(function(oData) {
                     oView.setBusy(false);
 
-                    // Count cancelled
-                    var iCancelled = 0;
+                    // Clear table selection
+                    var oTable = this.byId("assignmentsTable");
+                    oTable.removeSelections(true);
+
+                    // Analyze results
+                    var iTotalCancellations = aCancellations.length;
+                    var iSuccessful = 0;
+                    var iFailed = 0;
+                    var aFailedMessages = [];
+
                     if (oData.results) {
                         oData.results.forEach(function(oResult) {
                             if (oResult.cancellationStatus === "CANCELLED") {
-                                iCancelled++;
+                                iSuccessful++;
+                            } else if (oResult.cancellationStatus === "FAILED") {
+                                iFailed++;
+                                aFailedMessages.push(
+                                    oResult.dependentId + " (" + oResult.date + "): " + 
+                                    (oResult.errorMessage || "Error desconocido")
+                                );
                             }
                         });
                     }
 
-                    MessageBox.success("Se cancelaron " + iCancelled + " asignaciones exitosamente", {
-                        onClose: function() {
-                            // Reload assignments
-                            this._loadAssignments();
-                            
-                            // Clear selection
-                            var oTable = this.byId("assignmentsTable");
-                            oTable.removeSelections(true);
-                        }.bind(this)
-                    });
+                    // Show appropriate message based on status
+                    var sMessage = "";
+                    var sTitle = "";
+
+                    if (oData.status === "SUCCESS") {
+                        sMessage = "Todas las cancelaciones se realizaron exitosamente.\n";
+                        sMessage += "Total cancelado: " + iSuccessful;
+                        sTitle = "Cancelaci\u00f3n Exitosa";
+                        MessageBox.success(sMessage, {
+                            title: sTitle,
+                            onClose: function() {
+                                this._loadAssignments();
+                            }.bind(this)
+                        });
+                    } else if (oData.status === "PARTIAL_SUCCESS") {
+                        sMessage = "Algunas cancelaciones no se pudieron completar.\n\n";
+                        sMessage += "Cancelaciones exitosas: " + iSuccessful + "\n";
+                        sMessage += "Cancelaciones fallidas: " + iFailed + "\n\n";
+                        if (aFailedMessages.length > 0) {
+                            sMessage += "Detalles de errores:\n" + aFailedMessages.join("\n");
+                        }
+                        sTitle = "Cancelaci\u00f3n Parcial";
+                        MessageBox.warning(sMessage, {
+                            title: sTitle,
+                            onClose: function() {
+                                this._loadAssignments();
+                            }.bind(this)
+                        });
+                    } else if (oData.status === "ERROR") {
+                        sMessage = "No se pudieron cancelar las asignaciones.\n\n";
+                        if (aFailedMessages.length > 0) {
+                            sMessage += "Detalles de errores:\n" + aFailedMessages.join("\n");
+                        }
+                        MessageBox.error(sMessage, {
+                            title: "Error en Cancelaci\u00f3n"
+                        });
+                    }
                 }.bind(this))
                 .catch(function(oError) {
                     oView.setBusy(false);
@@ -187,25 +245,7 @@ sap.ui.define([
 
         onRefresh: function() {
             this._loadAssignments();
-            MessageToast.show("Actualizando información...");
-        },
-
-        onPreviousWeek: function() {
-            var oViewModel = this.getView().getModel();
-            var sCurrentWeek = oViewModel.getProperty("/currentWeekStart");
-            var oDate = new Date(sCurrentWeek);
-            oDate.setDate(oDate.getDate() - 7);
-            this._setCurrentWeek(oDate);
-            this._loadAssignments();
-        },
-
-        onNextWeek: function() {
-            var oViewModel = this.getView().getModel();
-            var sCurrentWeek = oViewModel.getProperty("/currentWeekStart");
-            var oDate = new Date(sCurrentWeek);
-            oDate.setDate(oDate.getDate() + 7);
-            this._setCurrentWeek(oDate);
-            this._loadAssignments();
+            MessageToast.show("Actualizando asignaciones...");
         },
 
         onNavBack: function() {

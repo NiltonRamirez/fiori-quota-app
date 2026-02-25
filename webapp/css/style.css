@@ -281,3 +281,38 @@
 .quotaTable .sapMListTblRow:hover {
     background-color: #f9f9f9;
 }
+/* My Assignments Table */
+.quotaAssignmentsTable {
+    border: 1px solid #d9d9d9;
+    border-radius: 0.25rem;
+    overflow-x: auto;
+    width: 100%;
+}
+
+.quotaAssignmentsTable .sapMListTbl {
+    border: none;
+}
+
+.quotaAssignmentsTable thead {
+    background-color: #f7f7f7;
+}
+
+.quotaAssignmentsTable .sapMListTblHeaderCell {
+    padding: 1rem 0.5rem;
+    border-bottom: 2px solid #d9d9d9;
+    font-weight: 600;
+}
+
+.quotaAssignmentsTable .sapMListTblCell {
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: middle;
+}
+
+.quotaAssignmentsTable .sapMListTblRow:hover {
+    background-color: #f9f9f9;
+}
+
+.quotaAssignmentsTable .sapMListTblRow.sapMLIBSelected {
+    background-color: #e5f0fa;
+}
