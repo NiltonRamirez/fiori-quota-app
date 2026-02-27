@@ -70,6 +70,8 @@ modules:
         - npm install
         - npm run build:mta
       supported-platforms: []
+    requires:
+      - name: fiori-quota-app-destination-service
 
 resources:
   - name: fiori-quota-app-destination-service
