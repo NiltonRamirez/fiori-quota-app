@@ -35,7 +35,7 @@ clientSecret: "a1b2c3d4e5f6g7h8i9j0..." # Tu secreto real aquí
 
 ```bash
 # Conectar a la API de Cloud Foundry
-cf login -a https://api.cf.us10-002.hana.ondemand.com
+cf login -a https://api.cf.us10-001.hana.ondemand.com
 
 # Seleccionar:
 # - Org: [nombre-org-cliente]
@@ -246,8 +246,8 @@ cf deploy mta_archives/fiori-quota-app_1.0.0.mtar -e deployment-config.mtaext
 
 ## 📞 URLs Importantes
 
-- **BTP Cockpit**: https://cockpit.us10-002.hana.ondemand.com/
-- **CF API**: https://api.cf.us10-002.hana.ondemand.com
+- **BTP Cockpit**: https://cockpit.us10-001.hana.ondemand.com/
+- **CF API**: https://api.cf.us10-001.hana.ondemand.com
 - **GitHub Repo**: https://github.com/NiltonRamirez/fiori-quota-app
 
 ---

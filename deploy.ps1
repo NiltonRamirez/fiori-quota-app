@@ -10,13 +10,13 @@ cf target
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ No estás conectado a Cloud Foundry" -ForegroundColor Red
-    Write-Host "Ejecuta: cf login -a https://api.cf.us10-002.hana.ondemand.com" -ForegroundColor Yellow
+    Write-Host "Ejecuta: cf login -a https://api.cf.us10-001.hana.ondemand.com" -ForegroundColor Yellow
     exit 1
 }
 
 # 2. Instalar dependencias
 Write-Host "📦 Instalando dependencias..." -ForegroundColor Cyan
-npm ci
+npm install
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Error instalando dependencias" -ForegroundColor Red

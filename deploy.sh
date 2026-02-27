@@ -12,7 +12,7 @@ cf target
 
 if [ $? -ne 0 ]; then
     echo "❌ No estás conectado a Cloud Foundry"
-    echo "Ejecuta: cf login -a https://api.cf.us10-002.hana.ondemand.com"
+    echo "Ejecuta: cf login -a https://api.cf.us10-001.hana.ondemand.com"
     exit 1
 fi
 
