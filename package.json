@@ -7,6 +7,8 @@
     "start": "ui5 serve --port 8080 --open index.html",
     "start-flp": "ui5 serve --port 8080 --open flpSandbox.html",
     "build": "ui5 build --clean-dest --dest dist",
+    "build:mta": "ui5 build --clean-dest --dest dist && node create-zip.js",
+    "create-zip": "node create-zip.js",
     "deploy": "npm run build && cf push",
     "deploy:mta": "mbt build -t ./mta_archives && cf deploy mta_archives/fiori-quota-app_1.0.0.mtar",
     "lint": "eslint webapp/",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@ui5/cli": "^3.0.0",
     "@sap/ux-ui5-tooling": "^1.0.0",
+    "archiver": "^7.0.0",
     "eslint": "^8.0.0"
   },
   "ui5": {

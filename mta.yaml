@@ -11,7 +11,7 @@ build-parameters:
     - builder: custom
       commands:
         - npm ci
-        - npm run build
+        - npm run build:mta
 
 modules:
   - name: fiori-quota-app-destination-content
@@ -68,7 +68,7 @@ modules:
       builder: custom
       commands:
         - npm install
-        - npm run build
+        - npm run build:mta
       supported-platforms: []
 
 resources:
