@@ -16,6 +16,8 @@ build-parameters:
 modules:
   - name: fiori-quota-app-destination-content
     type: com.sap.application.content
+    build-parameters:
+      no-source: true
     requires:
       - name: fiori-quota-app-destination-service
         parameters:
