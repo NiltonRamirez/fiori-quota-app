@@ -36,6 +36,10 @@ visual_ext_index.html
 .env
 .env.local
 
+# MTA deployment config with secrets
+*.mtaext
+deployment-config.mtaext
+
 # Package manager
 package-lock.json
 yarn.lock
