@@ -36,10 +36,19 @@ archive.on('error', function(err) {
 // Pipe archive data to the file
 archive.pipe(output);
 
-// Agregar todos los archivos de la carpeta dist, EXCEPTO el ZIP mismo
-archive.glob('**/*', {
-    cwd: distFolder,
-    ignore: ['comccbquota.zip']
+// Agregar todos los archivos de la carpeta dist en la raíz del ZIP
+// EXCEPTO el ZIP mismo
+const files = fs.readdirSync(distFolder);
+files.forEach(file => {
+    if (file !== 'comccbquota.zip') {
+        const filePath = path.join(distFolder, file);
+        const stat = fs.statSync(filePath);
+        if (stat.isFile()) {
+            archive.file(filePath, { name: file });
+        } else if (stat.isDirectory()) {
+            archive.directory(filePath, file);
+        }
+    }
 });
 
 // Finalizar el archivo

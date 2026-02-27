@@ -53,12 +53,12 @@ modules:
         parameters:
           content-target: true
     build-parameters:
-      build-result: dist
+      build-result: resources
       requires:
         - artifacts:
             - comccbquota.zip
           name: comccbquota
-          target-path: dist/
+          target-path: resources/
 
   - name: comccbquota
     type: html5

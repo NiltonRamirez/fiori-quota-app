@@ -4,6 +4,7 @@ npm-debug.log*
 
 # Build outputs
 dist/
+resources/
 mta_archives/
 .build/
 target/
