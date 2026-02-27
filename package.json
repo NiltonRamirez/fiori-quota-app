@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ui5 serve --port 8080 --open index.html",
-    "start-flp": "ui5 serve --port 8080 --open test/flpSandbox.html",
+    "start-flp": "ui5 serve --port 8080 --open flpSandbox.html",
     "build": "ui5 build --clean-dest --dest dist",
     "deploy": "npm run build && cf push",
     "deploy:mta": "mbt build -t ./mta_archives && cf deploy mta_archives/fiori-quota-app_1.0.0.mtar",

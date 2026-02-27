@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiori Launchpad Sandbox - Gestión de Cupos</title>
+
+    <script>
+        window["sap-ushell-config"] = {
+            defaultRenderer: "fiori2",
+            bootstrapPlugins: {
+                "RuntimeAuthoringPlugin": {
+                    component: "sap.ushell.plugins.rta",
+                    config: {
+                        validateAppVersion: false
+                    }
+                }
+            },
+            renderers: {
+                fiori2: {
+                    componentData: {
+                        config: {
+                            enableSearch: false,
+                            rootIntent: "Shell-home"
+                        }
+                    }
+                }
+            },
+            services: {
+                "LaunchPage": {
+                    "adapter": {
+                        "config": {
+                            "groups": [{
+                                "tiles": [{
+                                    "tileType": "sap.ushell.ui.tile.StaticTile",
+                                    "properties": {
+                                        "title": "Asignación de Cupos",
+                                        "subtitle": "Solicitar cupos semanales",
+                                        "info": "Nueva solicitud",
+                                        "icon": "sap-icon://calendar",
+                                        "targetURL": "#QuotaApp-display"
+                                    }
+                                }, {
+                                    "tileType": "sap.ushell.ui.tile.StaticTile",
+                                    "properties": {
+                                        "title": "Mis Cupos Asignados",
+                                        "subtitle": "Ver y cancelar asignaciones",
+                                        "info": "Gestión",
+                                        "icon": "sap-icon://appointment",
+                                        "targetURL": "#QuotaApp-myAssignments"
+                                    }
+                                }]
+                            }]
+                        }
+                    }
+                },
+                "ClientSideTargetResolution": {
+                    "adapter": {
+                        "config": {
+                            "inbounds": {
+                                "QuotaApp-display": {
+                                    "semanticObject": "QuotaApp",
+                                    "action": "display",
+                                    "title": "Asignación de Cupos",
+                                    "signature": {
+                                        "parameters": {},
+                                        "additionalParameters": "allowed"
+                                    },
+                                    "resolutionResult": {
+                                        "applicationType": "SAPUI5",
+                                        "additionalInformation": "SAPUI5.Component=com.ccb.quota",
+                                        "url": "webapp/"
+                                    }
+                                },
+                                "QuotaApp-myAssignments": {
+                                    "semanticObject": "QuotaApp",
+                                    "action": "myAssignments",
+                                    "title": "Mis Cupos Asignados",
+                                    "signature": {
+                                        "parameters": {},
+                                        "additionalParameters": "allowed"
+                                    },
+                                    "resolutionResult": {
+                                        "applicationType": "SAPUI5",
+                                        "additionalInformation": "SAPUI5.Component=com.ccb.quota",
+                                        "url": "webapp/",
+                                        "navigationMode": "embedded"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "NavTargetResolution": {
+                    "config": {
+                        "enableClientSideTargetResolution": true
+                    }
+                }
+            }
+        };
+    </script>
+
+    <script src="https://ui5.sap.com/1.120.1/test-resources/sap/ushell/bootstrap/sandbox.js"></script>
+    <script src="https://ui5.sap.com/1.120.1/resources/sap-ui-core.js"
+        data-sap-ui-libs="sap.m, sap.ushell, sap.ui.layout"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-frameOptions="allow"
+        data-sap-ui-bindingSyntax="complex">
+    </script>
+
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            sap.ushell.Container.createRenderer().placeAt("content");
+        });
+    </script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>
