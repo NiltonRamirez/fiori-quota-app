@@ -25,8 +25,123 @@ sap.ui.define([
                 return Promise.resolve(this._oUserInfo);
             }
 
-            console.log("👤 Fetching user info from /user-api/currentUser");
+            console.log("� ===== BÚSQUEDA COMPLETA DE INFORMACIÓN DE USUARIO =====");
             
+            // Method 1: Check sessionStorage and localStorage for tokens
+            this._debugStorage();
+            
+            // Method 2: Try to get user from token
+            var oUserFromToken = this._getUserFromToken();
+            if (oUserFromToken) {
+                console.log("✅ Usuario encontrado en token JWT:", oUserFromToken);
+                this._oUserInfo = oUserFromToken;
+                return Promise.resolve(this._oUserInfo);
+            }
+            
+            // Method 3: Try User API
+            console.log("🌐 Intentando User API /user-api/currentUser...");
+            return this._fetchUserFromAPI();
+        },
+
+        /**
+         * Debug: Log all storage contents
+         * @private
+         */
+        _debugStorage: function() {
+            console.log("📦 SessionStorage keys:", Object.keys(sessionStorage));
+            console.log("📦 LocalStorage keys:", Object.keys(localStorage));
+            
+            // Check for any JWT-like tokens
+            var aTokenKeys = [];
+            for (var key in sessionStorage) {
+                var value = sessionStorage.getItem(key);
+                if (value && (value.startsWith('ey') || key.toLowerCase().includes('token') || key.toLowerCase().includes('auth'))) {
+                    aTokenKeys.push(key);
+                    console.log("🔑 Posible token en sessionStorage:", key, "=", value.substring(0, 50) + "...");
+                }
+            }
+            
+            for (var key in localStorage) {
+                var value = localStorage.getItem(key);
+                if (value && (value.startsWith('ey') || key.toLowerCase().includes('token') || key.toLowerCase().includes('auth'))) {
+                    aTokenKeys.push(key);
+                    console.log("🔑 Posible token en localStorage:", key, "=", value.substring(0, 50) + "...");
+                }
+            }
+            
+            // Check cookies
+            console.log("🍪 Cookies:", document.cookie);
+            
+            if (aTokenKeys.length === 0) {
+                console.log("⚠️ No se encontraron tokens en storage");
+            }
+        },
+
+        /**
+         * Try to extract user from JWT token
+         * @private
+         * @returns {Object|null} User info or null
+         */
+        _getUserFromToken: function() {
+            console.log("🔐 Intentando obtener usuario del token XSUAA...");
+            
+            // Try different storage locations
+            var aLocations = [
+                { storage: sessionStorage, name: "sessionStorage" },
+                { storage: localStorage, name: "localStorage" }
+            ];
+            
+            for (var i = 0; i < aLocations.length; i++) {
+                var oLoc = aLocations[i];
+                
+                for (var key in oLoc.storage) {
+                    try {
+                        var value = oLoc.storage.getItem(key);
+                        
+                        // Check if it looks like a JWT (starts with 'ey' and has 3 parts)
+                        if (value && value.startsWith('ey') && value.split('.').length === 3) {
+                            console.log("📝 Token encontrado en:", oLoc.name, "key:", key);
+                            
+                            var parts = value.split('.');
+                            var payload = JSON.parse(atob(parts[1]));
+                            
+                            console.log("📋 Token payload completo:", payload);
+                            
+                            // Extract user info
+                            var oUserInfo = {
+                                id: payload.email || payload.user_name || payload.name || payload.sub || "",
+                                email: payload.email || payload.mail || "",
+                                name: payload.given_name && payload.family_name
+                                    ? payload.given_name + " " + payload.family_name
+                                    : payload.name || payload.email || "",
+                                firstName: payload.given_name || "",
+                                lastName: payload.family_name || "",
+                                fullName: payload.name || 
+                                         (payload.given_name && payload.family_name 
+                                             ? payload.given_name + " " + payload.family_name 
+                                             : payload.email || "")
+                            };
+                            
+                            console.log("✅ Usuario extraído del token:", oUserInfo);
+                            return oUserInfo;
+                        }
+                    } catch (e) {
+                        // Token no válido o error al parsear, continuar
+                        console.log("⚠️ Error parseando token de", key, ":", e.message);
+                    }
+                }
+            }
+            
+            console.log("❌ No se encontró token XSUAA válido");
+            return null;
+        },
+
+        /**
+         * Fetch user from User API
+         * @private
+         * @returns {Promise} Promise with user info
+         */
+        _fetchUserFromAPI: function() {
             return fetch("/user-api/currentUser", {
                 method: "GET",
                 headers: {
@@ -34,14 +149,15 @@ sap.ui.define([
                 }
             })
             .then(function(response) {
+                console.log("📥 User API response status:", response.status);
                 if (!response.ok) {
-                    console.error("❌ Error fetching user info:", response.status);
-                    throw new Error("Failed to fetch user information");
+                    console.error("❌ User API error:", response.status, response.statusText);
+                    throw new Error("User API returned " + response.status);
                 }
                 return response.json();
             })
             .then(function(oUserData) {
-                console.log("✅ User info received:", oUserData);
+                console.log("✅ User API response:", oUserData);
                 
                 // Extract relevant user information
                 this._oUserInfo = {
@@ -62,7 +178,7 @@ sap.ui.define([
                 return this._oUserInfo;
             }.bind(this))
             .catch(function(error) {
-                console.error("❌ Error getting user info:", error);
+                console.error("❌ Error fetching from User API:", error);
                 throw error;
             });
         },
