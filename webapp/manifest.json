@@ -16,6 +16,10 @@
       }
     }
   },
+  "sap.cloud": {
+    "public": true,
+    "service": "fiori.quota.app"
+  },
   "sap.ui": {
     "technology": "UI5",
     "icons": {
