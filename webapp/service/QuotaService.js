@@ -1,4 +1,4 @@
-sap.ui.define([
+﻿sap.ui.define([
     "sap/ui/base/Object"
 ], function (BaseObject) {
     "use strict";
@@ -25,26 +25,32 @@ sap.ui.define([
                 return Promise.resolve(this._oUserInfo);
             }
 
-            console.log("� ===== BÚSQUEDA COMPLETA DE INFORMACIÓN DE USUARIO =====");
-            
-            // Method 1: Try Fiori Launchpad Shell API (Work Zone)`n            var oUserFromFLP = this._getUserFromFLP();`n            if (oUserFromFLP) {`n                console.log(\"? Usuario obtenido de FLP/Work Zone:\", oUserFromFLP);`n                this._oUserInfo = oUserFromFLP;`n                return Promise.resolve(this._oUserInfo);`n            }`n            `n            // Method 2: Try to get user from JWT token in storage
-            var oUserFromToken = this._getUserFromToken();
-            if (oUserFromToken) {
-                console.log("✅ Usuario encontrado en token JWT:", oUserFromToken);
-                this._oUserInfo = oUserFromToken;
-                return Promise.resolve(this._oUserInfo);
-            }
-            
-            // Method 3: Try User API
-            console.log("🌐 Intentando User API /user-api/currentUser...");
-            return this._fetchUserFromAPI();
-        },
 
-        /**
-         * Debug: Log all storage contents
-         * @private
-         */        /**
-         * Get user from Fiori Launchpad Shell
+            console.log("🔍 Obteniendo información del usuario autenticado...");
+            
+            // Method 1: Try Fiori Launchpad Shell API (Work Zone) - RETURNS PROMISE
+            return this._getUserFromFLP()
+                .then(function(oUserFromFLP) {
+                    if (oUserFromFLP) {
+                        console.log("✅ Usuario obtenido de FLP/Work Zone:", oUserFromFLP);
+                        this._oUserInfo = oUserFromFLP;
+                        return this._oUserInfo;
+                    }
+                    
+                    // Method 2: Try to get user from JWT token in storage
+                    console.log("🔐 Intentando obtener usuario del token XSUAA...");
+                    var oUserFromToken = this._getUserFromToken();
+                    if (oUserFromToken) {
+                        console.log("✅ Usuario encontrado en token JWT:", oUserFromToken);
+                        this._oUserInfo = oUserFromToken;
+                        return this._oUserInfo;
+                    }
+                    
+                    // Method 3: Try User API
+                    console.log("🌐 Intentando User API /user-api/currentUser...");
+                    return this._fetchUserFromAPI();
+                }.bind(this));
+        },
          * @private
          * @returns {Promise} Promise that resolves with user info or null
          */
