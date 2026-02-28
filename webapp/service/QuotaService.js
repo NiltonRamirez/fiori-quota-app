@@ -50,53 +50,124 @@ sap.ui.define([
          */
         _getUserFromFLP: function() {
             try {
+                console.log("🔍 Verificando disponibilidad de sap.ushell...");
+                console.log("  - typeof sap:", typeof sap);
+                console.log("  - sap existe:", !!sap);
+                
+                if (sap) {
+                    console.log("  - typeof sap.ushell:", typeof sap.ushell);
+                    console.log("  - sap.ushell existe:", !!sap.ushell);
+                }
+                
+                if (sap && sap.ushell) {
+                    console.log("  - typeof sap.ushell.Container:", typeof sap.ushell.Container);
+                    console.log("  - sap.ushell.Container existe:", !!sap.ushell.Container);
+                }
+                
                 // Check if we're running in Fiori Launchpad/Work Zone
                 if (sap && sap.ushell && sap.ushell.Container) {
                     console.log("🚀 FLP Container detectado, obteniendo usuario...");
                     
                     var oUser = sap.ushell.Container.getUser();
+                    console.log("📦 Objeto User completo:", oUser);
+                    console.log("📦 Tipo de User:", typeof oUser);
                     
                     if (oUser) {
-                        var sUserId = oUser.getId(); // Este es el employee number (configurado en IAS Subject Name Identifier)
-                        var sEmail = oUser.getEmail();
-                        var sFullName = oUser.getFullName();
+                        // Intentar todos los métodos posibles
+                        console.log("🔍 Intentando métodos del objeto User:");
                         
-                        console.log("📋 FLP User data:", {
+                        var sUserId = null;
+                        var sEmail = null;
+                        var sFullName = null;
+                        
+                        // getId()
+                        try {
+                            sUserId = oUser.getId();
+                            console.log("  ✅ getId():", sUserId, "(tipo:", typeof sUserId, ")");
+                        } catch (e) {
+                            console.log("  ❌ getId() falló:", e.message);
+                        }
+                        
+                        // getEmail()
+                        try {
+                            sEmail = oUser.getEmail();
+                            console.log("  ✅ getEmail():", sEmail, "(tipo:", typeof sEmail, ")");
+                        } catch (e) {
+                            console.log("  ❌ getEmail() falló:", e.message);
+                        }
+                        
+                        // getFullName()
+                        try {
+                            sFullName = oUser.getFullName();
+                            console.log("  ✅ getFullName():", sFullName, "(tipo:", typeof sFullName, ")");
+                        } catch (e) {
+                            console.log("  ❌ getFullName() falló:", e.message);
+                        }
+                        
+                        // Intentar propiedades directas
+                        console.log("🔍 Propiedades directas del objeto:");
+                        for (var prop in oUser) {
+                            if (oUser.hasOwnProperty(prop)) {
+                                console.log("  - " + prop + ":", oUser[prop]);
+                            }
+                        }
+                        
+                        // Intentar métodos adicionales comunes
+                        var additionalMethods = ['getFirstName', 'getLastName', 'getUserName', 'getLanguage', 'getEmployeeNumber'];
+                        console.log("🔍 Intentando métodos adicionales:");
+                        additionalMethods.forEach(function(method) {
+                            try {
+                                if (typeof oUser[method] === 'function') {
+                                    var value = oUser[method]();
+                                    console.log("  ✅ " + method + "():", value);
+                                }
+                            } catch (e) {
+                                // Silenciar errores de métodos que no existen
+                            }
+                        });
+                        
+                        console.log("📋 FLP User data obtenido:", {
                             id: sUserId,
                             email: sEmail,
                             fullName: sFullName
                         });
                         
-                        // Usar employee number (getId) como ID principal
-                        var oUserInfo = {
-                            id: sUserId || "",  // Employee number del Subject Name Identifier
-                            email: sEmail || "",
-                            name: sFullName || sEmail || "",
-                            firstName: "",
-                            lastName: "",
-                            fullName: sFullName || ""
-                        };
-                        
-                        // Try to split full name into first/last
-                        if (sFullName) {
-                            var aParts = sFullName.split(" ");
-                            if (aParts.length >= 2) {
-                                oUserInfo.firstName = aParts[0];
-                                oUserInfo.lastName = aParts.slice(1).join(" ");
+                        // Si tenemos al menos el ID, crear el objeto de usuario
+                        if (sUserId || sEmail) {
+                            var oUserInfo = {
+                                id: sUserId || sEmail || "",
+                                email: sEmail || "",
+                                name: sFullName || sEmail || sUserId || "",
+                                firstName: "",
+                                lastName: "",
+                                fullName: sFullName || ""
+                            };
+                            
+                            // Try to split full name into first/last
+                            if (sFullName) {
+                                var aParts = sFullName.split(" ");
+                                if (aParts.length >= 2) {
+                                    oUserInfo.firstName = aParts[0];
+                                    oUserInfo.lastName = aParts.slice(1).join(" ");
+                                }
                             }
+                            
+                            console.log("✅ Usuario procesado de FLP:", oUserInfo);
+                            console.log("✅ userId que se usará:", oUserInfo.id);
+                            return oUserInfo;
+                        } else {
+                            console.log("❌ No se pudo obtener ID ni email del usuario FLP");
                         }
-                        
-                        console.log("✅ Usuario procesado de FLP:", oUserInfo);
-                        console.log("✅ Employee Number (userId):", oUserInfo.id);
-                        return oUserInfo;
                     } else {
-                        console.log("⚠️ FLP Container exists but getUser() returned null");
+                        console.log("⚠️ FLP Container.getUser() returned null/undefined");
                     }
                 } else {
-                    console.log("ℹ️ No estamos en FLP/Work Zone (sap.ushell no disponible)");
+                    console.log("ℹ️ No estamos en FLP/Work Zone");
+                    console.log("  - sap.ushell no disponible o Container no existe");
                 }
             } catch (e) {
                 console.error("❌ Error obteniendo usuario de FLP:", e);
+                console.error("  Stack:", e.stack);
             }
             
             return null;
