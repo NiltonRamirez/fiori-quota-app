@@ -51,6 +51,9 @@
                     return this._fetchUserFromAPI();
                 }.bind(this));
         },
+
+        /**
+         * Get user from Fiori Launchpad
          * @private
          * @returns {Promise} Promise that resolves with user info or null
          */
@@ -453,7 +456,7 @@
                 endpoint: sEndpoint
             });
             
-            return this._callService(sEndpoint, "GET");
+            return this._callService(sEndpoint, "GET", null);
         },
 
         /**
