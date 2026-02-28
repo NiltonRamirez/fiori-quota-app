@@ -25,8 +25,40 @@ sap.ui.define([
             this._oQuotaService = new QuotaService();
             this.setModel(new JSONModel(), "app");
 
-            // Get user information from IAS
-            this._getUserInfo();
+            // Wait for FLP to be ready before getting user info
+            this._waitForFLPThenGetUserInfo();
+        },
+
+        _waitForFLPThenGetUserInfo: function() {
+            var that = this;
+            
+            // Check if we're in FLP/Work Zone
+            if (sap && sap.ushell && sap.ushell.Container) {
+                // FLP is ready, get user info immediately
+                console.log("✅ FLP ya está disponible, obteniendo usuario...");
+                this._getUserInfo();
+            } else {
+                // FLP not ready yet, wait for it
+                console.log("⏳ Esperando a que FLP esté disponible...");
+                
+                // Set a timeout to wait for FLP to be ready
+                var checkFLPInterval = setInterval(function() {
+                    if (sap && sap.ushell && sap.ushell.Container) {
+                        console.log("✅ FLP ahora está disponible!");
+                        clearInterval(checkFLPInterval);
+                        that._getUserInfo();
+                    }
+                }, 100); // Check every 100ms
+                
+                // Fallback: if FLP not ready after 5 seconds, proceed anyway
+                setTimeout(function() {
+                    clearInterval(checkFLPInterval);
+                    console.log("⚠️ FLP no se cargó en 5 segundos, procediendo sin él...");
+                    if (!that.getModel("app").getProperty("/userId")) {
+                        that._getUserInfo();
+                    }
+                }, 5000);
+            }
         },
 
         getQuotaService: function() {
