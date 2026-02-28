@@ -1,19 +1,15 @@
 {
+  "welcomeFile": "/index.html",
   "authenticationMethod": "route",
   "routes": [
     {
       "source": "^/destinations/dest_int_s/(.*)$",
-      "target": "$1",
       "destination": "dest_int_s",
-      "authenticationType": "none",
-      "csrfProtection": false
+      "authenticationType": "xsuaa"
     },
     {
       "source": "^/(.*)$",
-      "target": "$1",
-      "localDir": ".",
-      "authenticationType": "none",
-      "csrfProtection": false
+      "localDir": "."
     }
   ]
 }
