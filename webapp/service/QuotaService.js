@@ -27,10 +27,7 @@ sap.ui.define([
 
             console.log("� ===== BÚSQUEDA COMPLETA DE INFORMACIÓN DE USUARIO =====");
             
-            // Method 1: Check sessionStorage and localStorage for tokens
-            this._debugStorage();
-            
-            // Method 2: Try to get user from token
+            // Method 1: Try Fiori Launchpad Shell API (Work Zone)`n            var oUserFromFLP = this._getUserFromFLP();`n            if (oUserFromFLP) {`n                console.log(\"? Usuario obtenido de FLP/Work Zone:\", oUserFromFLP);`n                this._oUserInfo = oUserFromFLP;`n                return Promise.resolve(this._oUserInfo);`n            }`n            `n            // Method 2: Try to get user from JWT token in storage
             var oUserFromToken = this._getUserFromToken();
             if (oUserFromToken) {
                 console.log("✅ Usuario encontrado en token JWT:", oUserFromToken);
@@ -46,7 +43,64 @@ sap.ui.define([
         /**
          * Debug: Log all storage contents
          * @private
+         */        /**
+         * Get user from Fiori Launchpad Shell
+         * @private
+         * @returns {Object|null} User info or null
          */
+        _getUserFromFLP: function() {
+            try {
+                // Check if we're running in Fiori Launchpad/Work Zone
+                if (sap && sap.ushell && sap.ushell.Container) {
+                    console.log("🚀 FLP Container detectado, obteniendo usuario...");
+                    
+                    var oUser = sap.ushell.Container.getUser();
+                    
+                    if (oUser) {
+                        var sUserId = oUser.getId();
+                        var sEmail = oUser.getEmail();
+                        var sFullName = oUser.getFullName();
+                        
+                        console.log("📋 FLP User data:", {
+                            id: sUserId,
+                            email: sEmail,
+                            fullName: sFullName
+                        });
+                        
+                        var oUserInfo = {
+                            id: sEmail || sUserId || "",
+                            email: sEmail || "",
+                            name: sFullName || sEmail || sUserId || "",
+                            firstName: "",
+                            lastName: "",
+                            fullName: sFullName || sEmail || sUserId || ""
+                        };
+                        
+                        // Try to split full name into first/last
+                        if (sFullName) {
+                            var aParts = sFullName.split(" ");
+                            if (aParts.length >= 2) {
+                                oUserInfo.firstName = aParts[0];
+                                oUserInfo.lastName = aParts.slice(1).join(" ");
+                            }
+                        }
+                        
+                        console.log("✅ Usuario procesado de FLP:", oUserInfo);
+                        return oUserInfo;
+                    } else {
+                        console.log("⚠️ FLP Container exists but getUser() returned null");
+                    }
+                } else {
+                    console.log("ℹ️ No estamos en FLP/Work Zone (sap.ushell no disponible)");
+                }
+            } catch (e) {
+                console.error("❌ Error obteniendo usuario de FLP:", e);
+            }
+            
+            return null;
+        },
+
+
         _debugStorage: function() {
             console.log("📦 SessionStorage keys:", Object.keys(sessionStorage));
             console.log("📦 LocalStorage keys:", Object.keys(localStorage));
@@ -430,3 +484,5 @@ sap.ui.define([
         }
     });
 });
+
+
