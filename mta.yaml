@@ -70,6 +70,8 @@ modules:
         - npm install
         - npm run build:mta
       supported-platforms: []
+    properties:
+      SAP_CLOUD_SERVICE: fiori.quota.app
     requires:
       - name: fiori-quota-app-destination-service
 
