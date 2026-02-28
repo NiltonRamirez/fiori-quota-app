@@ -57,7 +57,7 @@ sap.ui.define([
                     var oUser = sap.ushell.Container.getUser();
                     
                     if (oUser) {
-                        var sUserId = oUser.getId();
+                        var sUserId = oUser.getId(); // Este es el employee number (configurado en IAS Subject Name Identifier)
                         var sEmail = oUser.getEmail();
                         var sFullName = oUser.getFullName();
                         
@@ -67,13 +67,14 @@ sap.ui.define([
                             fullName: sFullName
                         });
                         
+                        // Usar employee number (getId) como ID principal
                         var oUserInfo = {
-                            id: sEmail || sUserId || "",
+                            id: sUserId || "",  // Employee number del Subject Name Identifier
                             email: sEmail || "",
-                            name: sFullName || sEmail || sUserId || "",
+                            name: sFullName || sEmail || "",
                             firstName: "",
                             lastName: "",
-                            fullName: sFullName || sEmail || sUserId || ""
+                            fullName: sFullName || ""
                         };
                         
                         // Try to split full name into first/last
@@ -86,6 +87,7 @@ sap.ui.define([
                         }
                         
                         console.log("✅ Usuario procesado de FLP:", oUserInfo);
+                        console.log("✅ Employee Number (userId):", oUserInfo.id);
                         return oUserInfo;
                     } else {
                         console.log("⚠️ FLP Container exists but getUser() returned null");
