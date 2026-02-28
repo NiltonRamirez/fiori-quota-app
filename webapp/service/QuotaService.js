@@ -46,131 +46,158 @@ sap.ui.define([
          */        /**
          * Get user from Fiori Launchpad Shell
          * @private
-         * @returns {Object|null} User info or null
+         * @returns {Promise} Promise that resolves with user info or null
          */
         _getUserFromFLP: function() {
-            try {
-                console.log("🔍 Verificando disponibilidad de sap.ushell...");
-                console.log("  - typeof sap:", typeof sap);
-                console.log("  - sap existe:", !!sap);
-                
-                if (sap) {
-                    console.log("  - typeof sap.ushell:", typeof sap.ushell);
-                    console.log("  - sap.ushell existe:", !!sap.ushell);
-                }
-                
-                if (sap && sap.ushell) {
-                    console.log("  - typeof sap.ushell.Container:", typeof sap.ushell.Container);
-                    console.log("  - sap.ushell.Container existe:", !!sap.ushell.Container);
-                }
-                
-                // Check if we're running in Fiori Launchpad/Work Zone
-                if (sap && sap.ushell && sap.ushell.Container) {
-                    console.log("🚀 FLP Container detectado, obteniendo usuario...");
-                    
-                    var oUser = sap.ushell.Container.getUser();
-                    console.log("📦 Objeto User completo:", oUser);
-                    console.log("📦 Tipo de User:", typeof oUser);
-                    
-                    if (oUser) {
-                        // Intentar todos los métodos posibles
-                        console.log("🔍 Intentando métodos del objeto User:");
-                        
-                        var sUserId = null;
-                        var sEmail = null;
-                        var sFullName = null;
-                        
-                        // getId()
-                        try {
-                            sUserId = oUser.getId();
-                            console.log("  ✅ getId():", sUserId, "(tipo:", typeof sUserId, ")");
-                        } catch (e) {
-                            console.log("  ❌ getId() falló:", e.message);
-                        }
-                        
-                        // getEmail()
-                        try {
-                            sEmail = oUser.getEmail();
-                            console.log("  ✅ getEmail():", sEmail, "(tipo:", typeof sEmail, ")");
-                        } catch (e) {
-                            console.log("  ❌ getEmail() falló:", e.message);
-                        }
-                        
-                        // getFullName()
-                        try {
-                            sFullName = oUser.getFullName();
-                            console.log("  ✅ getFullName():", sFullName, "(tipo:", typeof sFullName, ")");
-                        } catch (e) {
-                            console.log("  ❌ getFullName() falló:", e.message);
-                        }
-                        
-                        // Intentar propiedades directas
-                        console.log("🔍 Propiedades directas del objeto:");
-                        for (var prop in oUser) {
-                            if (oUser.hasOwnProperty(prop)) {
-                                console.log("  - " + prop + ":", oUser[prop]);
-                            }
-                        }
-                        
-                        // Intentar métodos adicionales comunes
-                        var additionalMethods = ['getFirstName', 'getLastName', 'getUserName', 'getLanguage', 'getEmployeeNumber'];
-                        console.log("🔍 Intentando métodos adicionales:");
-                        additionalMethods.forEach(function(method) {
-                            try {
-                                if (typeof oUser[method] === 'function') {
-                                    var value = oUser[method]();
-                                    console.log("  ✅ " + method + "():", value);
-                                }
-                            } catch (e) {
-                                // Silenciar errores de métodos que no existen
-                            }
-                        });
-                        
-                        console.log("📋 FLP User data obtenido:", {
-                            id: sUserId,
-                            email: sEmail,
-                            fullName: sFullName
-                        });
-                        
-                        // Si tenemos al menos el ID, crear el objeto de usuario
-                        if (sUserId || sEmail) {
-                            var oUserInfo = {
-                                id: sUserId || sEmail || "",
-                                email: sEmail || "",
-                                name: sFullName || sEmail || sUserId || "",
-                                firstName: "",
-                                lastName: "",
-                                fullName: sFullName || ""
-                            };
-                            
-                            // Try to split full name into first/last
-                            if (sFullName) {
-                                var aParts = sFullName.split(" ");
-                                if (aParts.length >= 2) {
-                                    oUserInfo.firstName = aParts[0];
-                                    oUserInfo.lastName = aParts.slice(1).join(" ");
-                                }
-                            }
-                            
-                            console.log("✅ Usuario procesado de FLP:", oUserInfo);
-                            console.log("✅ userId que se usará:", oUserInfo.id);
-                            return oUserInfo;
-                        } else {
-                            console.log("❌ No se pudo obtener ID ni email del usuario FLP");
-                        }
-                    } else {
-                        console.log("⚠️ FLP Container.getUser() returned null/undefined");
-                    }
-                } else {
-                    console.log("ℹ️ No estamos en FLP/Work Zone");
-                    console.log("  - sap.ushell no disponible o Container no existe");
-                }
-            } catch (e) {
-                console.error("❌ Error obteniendo usuario de FLP:", e);
-                console.error("  Stack:", e.stack);
+            console.log("🔍 Verificando disponibilidad de sap.ushell...");
+            console.log("  - typeof sap:", typeof sap);
+            console.log("  - sap existe:", !!sap);
+            
+            if (sap) {
+                console.log("  - typeof sap.ushell:", typeof sap.ushell);
+                console.log("  - sap.ushell existe:", !!sap.ushell);
             }
             
-            return null;
+            if (sap && sap.ushell) {
+                console.log("  - typeof sap.ushell.Container:", typeof sap.ushell.Container);
+                console.log("  - sap.ushell.Container existe:", !!sap.ushell.Container);
+            }
+            
+            // Check if we're running in Fiori Launchpad/Work Zone
+            if (sap && sap.ushell && sap.ushell.Container) {
+                console.log("🚀 FLP Container detectado, obteniendo UserInfo service (async)...");
+                
+                // Use getServiceAsync for Work Zone (async method - this is the correct approach)
+                return sap.ushell.Container.getServiceAsync("UserInfo")
+                    .then(function(oUserInfoService) {
+                        console.log("📦 UserInfo service obtenido:", oUserInfoService);
+                        console.log("📦 Tipo de service:", typeof oUserInfoService);
+                        
+                        if (oUserInfoService) {
+                            var sUserId = null;
+                            var sEmail = null;
+                            var sFullName = null;
+                            var sFirstName = null;
+                            var sLastName = null;
+                            
+                            console.log("🔍 Intentando métodos del UserInfo service:");
+                            
+                            // getId()
+                            try {
+                                sUserId = oUserInfoService.getId();
+                                console.log("  ✅ getId():", sUserId, "(tipo:", typeof sUserId, ")");
+                            } catch (e) {
+                                console.log("  ❌ getId() falló:", e.message);
+                            }
+                            
+                            // getEmail()
+                            try {
+                                sEmail = oUserInfoService.getEmail();
+                                console.log("  ✅ getEmail():", sEmail, "(tipo:", typeof sEmail, ")");
+                            } catch (e) {
+                                console.log("  ❌ getEmail() falló:", e.message);
+                            }
+                            
+                            // getFullName()
+                            try {
+                                sFullName = oUserInfoService.getFullName();
+                                console.log("  ✅ getFullName():", sFullName, "(tipo:", typeof sFullName, ")");
+                            } catch (e) {
+                                console.log("  ❌ getFullName() falló:", e.message);
+                            }
+                            
+                            // getFirstName()
+                            try {
+                                sFirstName = oUserInfoService.getFirstName();
+                                console.log("  ✅ getFirstName():", sFirstName, "(tipo:", typeof sFirstName, ")");
+                            } catch (e) {
+                                console.log("  ❌ getFirstName() falló:", e.message);
+                            }
+                            
+                            // getLastName()
+                            try {
+                                sLastName = oUserInfoService.getLastName();
+                                console.log("  ✅ getLastName():", sLastName, "(tipo:", typeof sLastName, ")");
+                            } catch (e) {
+                                console.log("  ❌ getLastName() falló:", e.message);
+                            }
+                            
+                            // Intentar propiedades directas
+                            console.log("🔍 Propiedades directas del service:");
+                            for (var prop in oUserInfoService) {
+                                if (oUserInfoService.hasOwnProperty(prop)) {
+                                    try {
+                                        console.log("  - " + prop + ":", oUserInfoService[prop]);
+                                    } catch (e) {
+                                        console.log("  - " + prop + ": (error al acceder)");
+                                    }
+                                }
+                            }
+                            
+                            // Intentar métodos adicionales
+                            var additionalMethods = ['getUserName', 'getLanguage', 'getEmployeeNumber', 'getUser', 'getTheme'];
+                            console.log("🔍 Intentando métodos adicionales:");
+                            additionalMethods.forEach(function(method) {
+                                try {
+                                    if (typeof oUserInfoService[method] === 'function') {
+                                        var value = oUserInfoService[method]();
+                                        console.log("  ✅ " + method + "():", value);
+                                    }
+                                } catch (e) {
+                                    // Silenciar errores
+                                }
+                            });
+                            
+                            console.log("📋 FLP UserInfo data completo:", {
+                                id: sUserId,
+                                email: sEmail,
+                                fullName: sFullName,
+                                firstName: sFirstName,
+                                lastName: sLastName
+                            });
+                            
+                            // Si tenemos al menos el ID, crear el objeto de usuario
+                            if (sUserId || sEmail) {
+                                var oUserInfo = {
+                                    id: sUserId || sEmail || "",
+                                    email: sEmail || "",
+                                    name: sFullName || sEmail || sUserId || "",
+                                    firstName: sFirstName || "",
+                                    lastName: sLastName || "",
+                                    fullName: sFullName || ""
+                                };
+                                
+                                // If first/last names not provided, try to split full name
+                                if (!oUserInfo.firstName && sFullName) {
+                                    var aParts = sFullName.split(" ");
+                                    if (aParts.length >= 2) {
+                                        oUserInfo.firstName = aParts[0];
+                                        oUserInfo.lastName = aParts.slice(1).join(" ");
+                                    }
+                                }
+                                
+                                console.log("✅ Usuario procesado de FLP UserInfo service:", oUserInfo);
+                                console.log("✅ userId que se usará:", oUserInfo.id);
+                                return oUserInfo;
+                            } else {
+                                console.log("❌ No se pudo obtener ID ni email del UserInfo service");
+                                return null;
+                            }
+                        } else {
+                            console.log("⚠️ UserInfo service returned null");
+                            return null;
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error("❌ Error obteniendo UserInfo service:", error);
+                        console.error("  Stack:", error.stack);
+                        return null;
+                    });
+            } else {
+                console.log("ℹ️ No estamos en FLP/Work Zone");
+                console.log("  - sap.ushell no disponible o Container no existe");
+                return Promise.resolve(null);
+            }
         },
 
 
