@@ -10,12 +10,6 @@
       "csrfProtection": false
     },
     {
-      "source": "^/services/userapi/(.*)$",
-      "target": "/services/userapi/$1",
-      "authenticationType": "none",
-      "csrfProtection": false
-    },
-    {
       "source": "^(.*)$",
       "target": "$1",
       "authenticationType": "none"
