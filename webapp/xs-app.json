@@ -10,7 +10,7 @@
       "csrfProtection": false
     },
     {
-      "source": "^(.*)$",
+      "source": "^/(.*)$",
       "target": "$1",
       "localDir": ".",
       "authenticationType": "none",
