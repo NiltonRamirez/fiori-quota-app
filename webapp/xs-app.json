@@ -12,7 +12,9 @@
     {
       "source": "^(.*)$",
       "target": "$1",
-      "authenticationType": "none"
+      "localDir": ".",
+      "authenticationType": "none",
+      "csrfProtection": false
     }
   ]
 }
