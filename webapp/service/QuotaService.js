@@ -10,6 +10,69 @@ sap.ui.define([
             this._sBaseUrl = "/destinations/dest_int_s";
             // CSRF Token for POST requests
             this._sCsrfToken = null;
+            // Cached user info
+            this._oUserInfo = null;
+        },
+
+        /**
+         * Get current user information from XSUAA
+         * @returns {Promise} Promise with user info object
+         */
+        getUserInfo: function() {
+            // Return cached user info if available
+            if (this._oUserInfo) {
+                console.log("👤 Using cached user info:", this._oUserInfo);
+                return Promise.resolve(this._oUserInfo);
+            }
+
+            console.log("👤 Fetching user info from /user-api/currentUser");
+            
+            return fetch("/user-api/currentUser", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    console.error("❌ Error fetching user info:", response.status);
+                    throw new Error("Failed to fetch user information");
+                }
+                return response.json();
+            })
+            .then(function(oUserData) {
+                console.log("✅ User info received:", oUserData);
+                
+                // Extract relevant user information
+                this._oUserInfo = {
+                    id: oUserData.email || oUserData.name || "",
+                    email: oUserData.email || "",
+                    name: oUserData.firstname && oUserData.lastname 
+                        ? oUserData.firstname + " " + oUserData.lastname 
+                        : oUserData.name || oUserData.email || "",
+                    firstName: oUserData.firstname || "",
+                    lastName: oUserData.lastname || "",
+                    fullName: oUserData.displayName || 
+                              (oUserData.firstname && oUserData.lastname 
+                                  ? oUserData.firstname + " " + oUserData.lastname 
+                                  : oUserData.name || oUserData.email || "")
+                };
+                
+                console.log("📋 Processed user info:", this._oUserInfo);
+                return this._oUserInfo;
+            }.bind(this))
+            .catch(function(error) {
+                console.error("❌ Error getting user info:", error);
+                throw error;
+            });
+        },
+
+        /**
+         * Clear cached user info (useful for testing or logout scenarios)
+         */
+        clearUserCache: function() {
+            this._oUserInfo = null;
+            console.log("🗑️ User cache cleared");
         },
 
         /**

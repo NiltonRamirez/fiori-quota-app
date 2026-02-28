@@ -16,6 +16,13 @@
                 id="refreshAssignmentsButton"
                 icon="sap-icon://refresh"
                 press=".onRefresh" />
+            <ToolbarSpacer />
+            <Text
+                text="{app>/userName}"
+                class="sapUiTinyMarginEnd" />
+            <core:Icon
+                src="sap-icon://person-placeholder"
+                color="#0854A0" />
         </headerContent>
 
         <content>

@@ -3,6 +3,12 @@
   "authenticationMethod": "route",
   "routes": [
     {
+      "source": "^/user-api/(.*)$",
+      "target": "/user-api/$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    },
+    {
       "source": "^/destinations/dest_int_s/(.*)$",
       "target": "/destinations/dest_int_s/$1",
       "destination": "dest_int_s",

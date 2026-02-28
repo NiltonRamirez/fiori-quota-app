@@ -34,46 +34,37 @@ sap.ui.define([
         },
 
         _getUserInfo: function() {
-            // HARDCODED USER FOR TESTING - Remove after IAS integration
-            var oAppModel = this.getModel("app");
-            oAppModel.setProperty("/userId", "10000");
-            oAppModel.setProperty("/userInfo", { 
-                name: "Usuario Test",
-                email: "test@ccb.org.co"
-            });
-            
-            console.log("✅ Usuario hardcodeado para testing: 10000");
-            
-            /* COMENTADO TEMPORALMENTE - Descomentar después de configurar IAS
             var that = this;
+            var oAppModel = this.getModel("app");
             
-            // Try to get user info from the SAP BTP user API
-            fetch("/services/userapi/currentUser", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(function(response) {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("No se pudo obtener información del usuario");
-            })
-            .then(function(userData) {
-                // Store user ID in the app model
-                var oAppModel = that.getModel("app");
-                oAppModel.setProperty("/userId", userData.name || userData.email || "10000");
-                oAppModel.setProperty("/userInfo", userData);
-            })
-            .catch(function(error) {
-                console.error("Error getting user info:", error);
-                // Fallback to a default user ID for development
-                var oAppModel = that.getModel("app");
-                oAppModel.setProperty("/userId", "10000");
-                oAppModel.setProperty("/userInfo", { name: "Usuario Demo" });
-            });
-            */
+            console.log("🔐 Obteniendo información del usuario autenticado...");
+            
+            // Use QuotaService to get user info
+            this._oQuotaService.getUserInfo()
+                .then(function(oUserInfo) {
+                    console.log("✅ Usuario autenticado:", oUserInfo);
+                    
+                    // Store user information in app model
+                    oAppModel.setProperty("/userId", oUserInfo.id);
+                    oAppModel.setProperty("/userInfo", oUserInfo);
+                    oAppModel.setProperty("/userName", oUserInfo.fullName);
+                    
+                    console.log("✅ User ID configurado:", oUserInfo.id);
+                })
+                .catch(function(error) {
+                    console.error("❌ Error obteniendo información del usuario:", error);
+                    
+                    // Fallback for development/testing
+                    console.warn("⚠️ Usando usuario de prueba por defecto");
+                    oAppModel.setProperty("/userId", "10000");
+                    oAppModel.setProperty("/userInfo", { 
+                        id: "10000",
+                        name: "Usuario Demo",
+                        email: "demo@ccb.org.co",
+                        fullName: "Usuario Demo"
+                    });
+                    oAppModel.setProperty("/userName", "Usuario Demo");
+                });
         }
     });
 });
