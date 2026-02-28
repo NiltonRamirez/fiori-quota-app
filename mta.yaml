@@ -91,6 +91,7 @@ resources:
                 tokenServiceURL: https://ccb-is-dev-5v6vds1v.authentication.us10.hana.ondemand.com/oauth/token
                 clientId: sb-929514f2-7649-4f9b-9d7a-33c735214f2d!b514001|it-rt-ccb-is-dev-5v6vds1v!b410334
                 clientSecret: ((dest_int_s_client_secret))
+                HTML5.DynamicDestination: true
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
