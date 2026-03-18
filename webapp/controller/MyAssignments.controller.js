@@ -24,8 +24,29 @@ sap.ui.define([
             // Set week based on current day (next week from Friday onward)
             this._setCurrentOrNextWeek();
             
-            // Load assignments
-            this._loadAssignments();
+            // Wait for user resolution before loading data
+            this._waitForUserAndLoad();
+        },
+
+        _waitForUserAndLoad: function(iAttempt) {
+            var iCurrentAttempt = iAttempt || 0;
+            var oAppModel = this.getOwnerComponent().getModel("app");
+            var sUserId = oAppModel && oAppModel.getProperty("/userId");
+
+            if (sUserId) {
+                this._loadAssignments();
+                return;
+            }
+
+            // Retry for up to ~5 seconds (20 * 250ms)
+            if (iCurrentAttempt >= 20) {
+                MessageToast.show("No se pudo obtener el ID de usuario");
+                return;
+            }
+
+            setTimeout(function() {
+                this._waitForUserAndLoad(iCurrentAttempt + 1);
+            }.bind(this), 250);
         },
 
         _setCurrentOrNextWeek: function() {
