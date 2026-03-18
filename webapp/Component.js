@@ -117,12 +117,7 @@ sap.ui.define([
                 return sConfiguredUserId;
             }
 
-            var bLocalHost = ["localhost", "127.0.0.1"].indexOf(window.location.hostname) !== -1;
-            if (bLocalHost) {
-                return "10000";
-            }
-
-            return "";
+            return "10000";
         }
     });
 });

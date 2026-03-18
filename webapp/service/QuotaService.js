@@ -45,10 +45,10 @@
                         this._oUserInfo = oUserFromToken;
                         return this._oUserInfo;
                     }
-                    
-                    // Method 3: Try User API
-                    console.log("🌐 Intentando User API /user-api/currentUser...");
-                    return this._fetchUserFromAPI();
+
+                    // Method 3 disabled temporarily to avoid blocking on /user-api/currentUser
+                    console.warn("⚠️ User API deshabilitada temporalmente. Se usará fallback de usuario de prueba.");
+                    throw new Error("No se encontró usuario autenticado (FLP/token) y User API está deshabilitada");
                 }.bind(this));
         },
 
