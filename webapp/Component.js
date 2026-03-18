@@ -85,18 +85,44 @@ sap.ui.define([
                 })
                 .catch(function(error) {
                     console.error("❌ Error obteniendo información del usuario:", error);
-                    
-                    // Fallback for development/testing
-                    console.warn("⚠️ Usando usuario de prueba por defecto");
-                    oAppModel.setProperty("/userId", "10000");
-                    oAppModel.setProperty("/userInfo", { 
-                        id: "10000",
-                        name: "Usuario Demo",
-                        email: "demo@ccb.org.co",
-                        fullName: "Usuario Demo"
-                    });
-                    oAppModel.setProperty("/userName", "Usuario Demo");
+
+                    // Controlled fallback for development/testing only
+                    var sTestUserId = that._getTestUserId();
+                    if (sTestUserId) {
+                        console.warn("⚠️ Usando usuario de prueba configurado:", sTestUserId);
+                        oAppModel.setProperty("/userId", sTestUserId);
+                        oAppModel.setProperty("/userInfo", {
+                            id: sTestUserId,
+                            name: "Usuario Demo",
+                            email: "demo@ccb.org.co",
+                            fullName: "Usuario Demo"
+                        });
+                        oAppModel.setProperty("/userName", "Usuario Demo");
+                    } else {
+                        console.error("❌ No se pudo resolver un usuario autenticado ni de prueba");
+                        oAppModel.setProperty("/userId", "");
+                        oAppModel.setProperty("/userInfo", null);
+                        oAppModel.setProperty("/userName", "");
+                    }
                 });
+        },
+
+        _getTestUserId: function() {
+            var oParams = new URLSearchParams(window.location.search || "");
+            var sQueryUserId = oParams.get("testUserId");
+            var sStorageUserId = window.localStorage.getItem("quota.testUserId");
+            var sConfiguredUserId = sQueryUserId || sStorageUserId;
+
+            if (sConfiguredUserId) {
+                return sConfiguredUserId;
+            }
+
+            var bLocalHost = ["localhost", "127.0.0.1"].indexOf(window.location.hostname) !== -1;
+            if (bLocalHost) {
+                return "10000";
+            }
+
+            return "";
         }
     });
 });

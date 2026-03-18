@@ -21,7 +21,7 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel);
 
-            // Set week based on current day (next week if Friday)
+            // Set week based on current day (next week from Friday onward)
             this._setCurrentOrNextWeek();
             
             // Load assignments
@@ -31,11 +31,11 @@ sap.ui.define([
         _setCurrentOrNextWeek: function() {
             var oToday = new Date();
             var dayOfWeek = oToday.getDay();
-            
-            // If Friday (5), show next week
-            if (dayOfWeek === 5) {
-                // Add 3 days to get to Monday of next week
-                oToday.setDate(oToday.getDate() + 3);
+
+            // Monday-Thursday: current week. Friday-Sunday: next Monday.
+            if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
+                var iDaysUntilNextMonday = (8 - dayOfWeek) % 7;
+                oToday.setDate(oToday.getDate() + iDaysUntilNextMonday);
             }
             
             this._setCurrentWeek(oToday);
