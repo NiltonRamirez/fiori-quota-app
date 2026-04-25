@@ -83,18 +83,7 @@ resources:
         HTML5Runtime_enabled: true
         init_data:
           instance:
-            destinations:
-              - Name: dest_int_s
-                Description: Destination to Integration Suite
-                Type: HTTP
-                ProxyType: Internet
-                URL: https://ccb-is-dev-5v6vds1v.it-cpi034-rt.cfapps.us10-002.hana.ondemand.com
-                Authentication: OAuth2ClientCredentials
-                tokenServiceURL: https://ccb-is-dev-5v6vds1v.authentication.us10.hana.ondemand.com/oauth/token
-                clientId: sb-929514f2-7649-4f9b-9d7a-33c735214f2d!b514001|it-rt-ccb-is-dev-5v6vds1v!b410334
-                clientSecret: ((dest_int_s_client_secret))
-                HTML5.DynamicDestination: true
-            existing_destinations_policy: update
+            existing_destinations_policy: ignore
         version: 1.0.0
       service: destination
       service-name: fiori-quota-app-destination-service
