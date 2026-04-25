@@ -19,37 +19,66 @@
          * @returns {Promise} Promise with user info object
          */
         getUserInfo: function() {
-            // Return cached user info if available
             if (this._oUserInfo) {
                 console.log("👤 Using cached user info:", this._oUserInfo);
                 return Promise.resolve(this._oUserInfo);
             }
 
-
             console.log("🔍 Obteniendo información del usuario autenticado...");
-            
-            // Method 1: Try Fiori Launchpad Shell API (Work Zone) - RETURNS PROMISE
+
             return this._getUserFromFLP()
                 .then(function(oUserFromFLP) {
-                    if (oUserFromFLP) {
-                        console.log("✅ Usuario obtenido de FLP/Work Zone:", oUserFromFLP);
-                        this._oUserInfo = oUserFromFLP;
-                        return this._oUserInfo;
-                    }
-                    
-                    // Method 2: Try to get user from JWT token in storage
-                    console.log("🔐 Intentando obtener usuario del token XSUAA...");
-                    var oUserFromToken = this._getUserFromToken();
-                    if (oUserFromToken) {
-                        console.log("✅ Usuario encontrado en token JWT:", oUserFromToken);
-                        this._oUserInfo = oUserFromToken;
-                        return this._oUserInfo;
+                    if (oUserFromFLP && oUserFromFLP.email) {
+                        console.log("✅ Email obtenido de FLP:", oUserFromFLP.email);
+                        return this._resolveEmployeeIdByEmail(oUserFromFLP);
                     }
 
-                    // Method 3 disabled temporarily to avoid blocking on /user-api/currentUser
-                    console.warn("⚠️ User API deshabilitada temporalmente. Se usará fallback de usuario de prueba.");
-                    throw new Error("No se encontró usuario autenticado (FLP/token) y User API está deshabilitada");
+                    // Fallback: intentar obtener email del token JWT
+                    console.log("🔐 FLP sin email, intentando token XSUAA...");
+                    var oUserFromToken = this._getUserFromToken();
+                    if (oUserFromToken && oUserFromToken.email) {
+                        console.log("✅ Email obtenido del token:", oUserFromToken.email);
+                        return this._resolveEmployeeIdByEmail(oUserFromToken);
+                    }
+
+                    throw new Error("No se encontró email de usuario en FLP ni en token");
                 }.bind(this));
+        },
+
+        /**
+         * Resuelve el employeeId llamando al servicio by-email y lo asigna como id del usuario
+         * @private
+         */
+        _resolveEmployeeIdByEmail: function(oBaseUserInfo) {
+            var sEmail = oBaseUserInfo.email;
+            var sUrl = this._sBaseUrl + "/http/api/v1/users/by-email?email=" + encodeURIComponent(sEmail);
+
+            console.log("📡 Resolviendo employeeId para:", sEmail, "→", sUrl);
+
+            return fetch(sUrl, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Error al consultar usuario por email: " + response.status);
+                }
+                return response.json();
+            })
+            .then(function(oData) {
+                console.log("✅ Respuesta by-email:", oData);
+                if (oData.status === "success" && oData.data && oData.data.employeeId) {
+                    oBaseUserInfo.id = oData.data.employeeId;
+                    this._oUserInfo = oBaseUserInfo;
+                    console.log("✅ employeeId resuelto:", oData.data.employeeId);
+                    return this._oUserInfo;
+                }
+                throw new Error("employeeId no encontrado en respuesta: " + JSON.stringify(oData));
+            }.bind(this))
+            .catch(function(error) {
+                console.error("❌ Error resolviendo employeeId por email:", error);
+                throw error;
+            });
         },
 
         /**
