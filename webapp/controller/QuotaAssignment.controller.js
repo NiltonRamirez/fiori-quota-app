@@ -375,14 +375,12 @@ sap.ui.define([
         },
 
         onOpenTermsAndConditions: function() {
-            // Open terms and conditions document from BTP destination
-            var sUrl = "/destinations/DOC_CONDICIONES/http";
+            var sUrl = sap.ui.require.toUrl("com/ccb/quota") + "/doc-condiciones";
             window.open(sUrl, "_blank", "noopener,noreferrer");
         },
 
         onOpenPrivacyPolicy: function() {
-            // Open privacy policy document from BTP destination
-            var sUrl = "/destinations/DOC_POLITICAS/http";
+            var sUrl = sap.ui.require.toUrl("com/ccb/quota") + "/doc-politicas";
             window.open(sUrl, "_blank", "noopener,noreferrer");
         },
 

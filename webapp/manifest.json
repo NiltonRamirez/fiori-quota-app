@@ -11,8 +11,21 @@
     "description": "{{appDescription}}",
     "dataSources": {
       "quotaService": {
-        "uri": "/destinations/dest_int_s/http",
+        "uri": "/http/",
         "type": "JSON"
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "comccbquota-show": {
+          "semanticObject": "comccbquota",
+          "action": "show",
+          "title": "{{comccbquota-show.flpTitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
       }
     }
   },

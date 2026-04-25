@@ -6,8 +6,8 @@
     return BaseObject.extend("com.ccb.quota.service.QuotaService", {
         
         constructor: function () {
-            // Base URL para el destination configurado en BTP
-            this._sBaseUrl = "/destinations/dest_int_s";
+            // Base URL: sap.ui.require.toUrl() incluye el prefijo del HTML5 repo automáticamente en Work Zone
+            this._sBaseUrl = sap.ui.require.toUrl("com/ccb/quota");
             // CSRF Token for POST requests
             this._sCsrfToken = null;
             // Cached user info
