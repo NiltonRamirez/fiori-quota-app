@@ -9,22 +9,19 @@ sap.ui.define([
     "use strict";
 
     return Controller.extend("com.ccb.quota.controller.MyAssignments", {
-        
+
         formatter: formatter,
 
         onInit: function () {
             var oViewModel = new JSONModel({
                 busy: false,
-                assignments: [],
+                childrenAssignments: [],
                 currentWeekStart: null,
                 currentWeekLabel: ""
             });
             this.getView().setModel(oViewModel);
 
-            // Set week based on current day (next week from Friday onward)
             this._setCurrentOrNextWeek();
-            
-            // Wait for user resolution before loading data
             this._waitForUserAndLoad();
         },
 
@@ -38,7 +35,6 @@ sap.ui.define([
                 return;
             }
 
-            // Retry for up to ~5 seconds (20 * 250ms)
             if (iCurrentAttempt >= 20) {
                 MessageToast.show("No se pudo obtener el ID de usuario");
                 return;
@@ -53,17 +49,15 @@ sap.ui.define([
             var oToday = new Date();
             var dayOfWeek = oToday.getDay();
 
-            // Monday-Thursday: current week. Friday-Sunday: next Monday.
             if (dayOfWeek === 5 || dayOfWeek === 6 || dayOfWeek === 0) {
                 var iDaysUntilNextMonday = (8 - dayOfWeek) % 7;
                 oToday.setDate(oToday.getDate() + iDaysUntilNextMonday);
             }
-            
+
             this._setCurrentWeek(oToday);
         },
 
         _setCurrentWeek: function(oDate) {
-            // Get Monday of the week
             var oMonday = new Date(oDate);
             var day = oMonday.getDay();
             var diff = oMonday.getDate() - day + (day === 0 ? -6 : 1);
@@ -74,17 +68,14 @@ sap.ui.define([
             oSunday.setDate(oMonday.getDate() + 6);
 
             var oViewModel = this.getView().getModel();
-            // Format date as YYYY-MM-DDTHH:mm:ss.SSS (without Z)
             var sWeekStart = this._formatDateForBackend(oMonday);
             oViewModel.setProperty("/currentWeekStart", sWeekStart);
-            
-            // Format week label
+
             var sWeekLabel = this._formatWeekLabel(oMonday, oSunday);
             oViewModel.setProperty("/currentWeekLabel", sWeekLabel);
         },
 
         _formatDateForBackend: function(oDate) {
-            // Format: YYYY-MM-DDTHH:mm:ss.SSS (without Z timezone)
             var year = oDate.getFullYear();
             var month = String(oDate.getMonth() + 1).padStart(2, '0');
             var day = String(oDate.getDate()).padStart(2, '0');
@@ -92,8 +83,8 @@ sap.ui.define([
             var minutes = String(oDate.getMinutes()).padStart(2, '0');
             var seconds = String(oDate.getSeconds()).padStart(2, '0');
             var milliseconds = String(oDate.getMilliseconds()).padStart(3, '0');
-            
-            return year + '-' + month + '-' + day + 'T' + 
+
+            return year + '-' + month + '-' + day + 'T' +
                    hours + ':' + minutes + ':' + seconds + '.' + milliseconds;
         },
 
@@ -122,146 +113,64 @@ sap.ui.define([
             var oQuotaService = this.getOwnerComponent().getQuotaService();
             oQuotaService.getMyAssignments(sUserId, sWeekStartDate)
                 .then(function(oData) {
-                    console.log("✅ Assignments Response:", oData);
-                    console.log("🔍 Type of oData:", typeof oData);
-                    console.log("🔍 oData.results:", oData.results);
-                    
                     oView.setBusy(false);
                     oViewModel.setProperty("/busy", false);
-                    
-                    // Process assignments data - backend returns 'results' not 'assignments'
-                    var aAssignments = oData.results || [];
-                    console.log("✅ Assignments array length:", aAssignments.length);
-                    oViewModel.setProperty("/assignments", aAssignments);
+
+                    var aRaw = oData.results || [];
+                    var aGrouped = this._groupByChild(aRaw);
+                    oViewModel.setProperty("/childrenAssignments", aGrouped);
                     oViewModel.setProperty("/employeeId", sUserId);
                 }.bind(this))
                 .catch(function(oError) {
                     oView.setBusy(false);
                     oViewModel.setProperty("/busy", false);
-                    
-                    // If no assignments found, just show empty list
+
                     if (oError.status === 404) {
-                        oViewModel.setProperty("/assignments", []);
+                        oViewModel.setProperty("/childrenAssignments", []);
                     } else {
-                        MessageBox.error("Error al cargar las asignaciones: " + 
+                        MessageBox.error("Error al cargar las asignaciones: " +
                             (oError.message || "Error desconocido"));
                     }
                 }.bind(this));
         },
 
-        onCancelSelected: function() {
-            var oTable = this.byId("assignmentsTable");
-            var aSelectedItems = oTable.getSelectedItems();
+        _groupByChild: function(aRaw) {
+            var aGrouped = [];
+            var oGroupMap = {};
 
-            if (aSelectedItems.length === 0) {
-                MessageToast.show("Por favor seleccione al menos una asignación para cancelar");
-                return;
-            }
-
-            // Collect cancellations
-            var aCancellations = [];
-            aSelectedItems.forEach(function(oItem) {
-                var oContext = oItem.getBindingContext();
-                var oAssignment = oContext.getObject();
-                aCancellations.push({
-                    dependentId: oAssignment.dependentId,
-                    date: oAssignment.date
-                });
+            aRaw.forEach(function(oItem) {
+                if (!oGroupMap[oItem.dependentId]) {
+                    oGroupMap[oItem.dependentId] = {
+                        dependentId: oItem.dependentId,
+                        fullName: oItem.fullName,
+                        assignments: []
+                    };
+                    aGrouped.push(oGroupMap[oItem.dependentId]);
+                }
+                oGroupMap[oItem.dependentId].assignments.push(oItem);
             });
 
-            // Confirm cancellation
-            MessageBox.confirm(
-                "¿Está seguro de cancelar las " + aCancellations.length + " asignaciones seleccionadas?",
-                {
-                    title: "Confirmar Cancelación",
-                    onClose: function(sAction) {
-                        if (sAction === MessageBox.Action.OK) {
-                            this._performCancellation(aCancellations);
-                        }
-                    }.bind(this)
-                }
-            );
+            aGrouped.forEach(function(oGroup) {
+                oGroup.daysText = oGroup.assignments.map(function(a) {
+                    return formatter.formatDayOfWeek(a.dayOfWeek);
+                }).join(", ");
+
+                var hasWaiting = oGroup.assignments.some(function(a) {
+                    return a.assignmentStatus === "WAITING_LIST";
+                });
+                oGroup.overallStatus = hasWaiting ? "WAITING_LIST" : "CONFIRMED";
+            });
+
+            return aGrouped;
         },
 
-        _performCancellation: function(aCancellations) {
-            var oView = this.getView();
-            var oViewModel = oView.getModel();
-            var sUserId = oViewModel.getProperty("/employeeId");
-
-            oView.setBusy(true);
-
-            var oQuotaService = this.getOwnerComponent().getQuotaService();
-            oQuotaService.cancelAssignments(sUserId, aCancellations)
-                .then(function(oData) {
-                    oView.setBusy(false);
-
-                    // Clear table selection
-                    var oTable = this.byId("assignmentsTable");
-                    oTable.removeSelections(true);
-
-                    // Analyze results
-                    var iTotalCancellations = aCancellations.length;
-                    var iSuccessful = 0;
-                    var iFailed = 0;
-                    var aFailedMessages = [];
-
-                    if (oData.results) {
-                        oData.results.forEach(function(oResult) {
-                            if (oResult.cancellationStatus === "CANCELLED") {
-                                iSuccessful++;
-                            } else if (oResult.cancellationStatus === "FAILED") {
-                                iFailed++;
-                                aFailedMessages.push(
-                                    oResult.dependentId + " (" + oResult.date + "): " + 
-                                    (oResult.errorMessage || "Error desconocido")
-                                );
-                            }
-                        });
-                    }
-
-                    // Show appropriate message based on status
-                    var sMessage = "";
-                    var sTitle = "";
-
-                    if (oData.status === "SUCCESS") {
-                        sMessage = "Todas las cancelaciones se realizaron exitosamente.\n";
-                        sMessage += "Total cancelado: " + iSuccessful;
-                        sTitle = "Cancelaci\u00f3n Exitosa";
-                        MessageBox.success(sMessage, {
-                            title: sTitle,
-                            onClose: function() {
-                                this._loadAssignments();
-                            }.bind(this)
-                        });
-                    } else if (oData.status === "PARTIAL_SUCCESS") {
-                        sMessage = "Algunas cancelaciones no se pudieron completar.\n\n";
-                        sMessage += "Cancelaciones exitosas: " + iSuccessful + "\n";
-                        sMessage += "Cancelaciones fallidas: " + iFailed + "\n\n";
-                        if (aFailedMessages.length > 0) {
-                            sMessage += "Detalles de errores:\n" + aFailedMessages.join("\n");
-                        }
-                        sTitle = "Cancelaci\u00f3n Parcial";
-                        MessageBox.warning(sMessage, {
-                            title: sTitle,
-                            onClose: function() {
-                                this._loadAssignments();
-                            }.bind(this)
-                        });
-                    } else if (oData.status === "ERROR") {
-                        sMessage = "No se pudieron cancelar las asignaciones.\n\n";
-                        if (aFailedMessages.length > 0) {
-                            sMessage += "Detalles de errores:\n" + aFailedMessages.join("\n");
-                        }
-                        MessageBox.error(sMessage, {
-                            title: "Error en Cancelaci\u00f3n"
-                        });
-                    }
-                }.bind(this))
-                .catch(function(oError) {
-                    oView.setBusy(false);
-                    MessageBox.error("Error al cancelar las asignaciones: " + 
-                        (oError.message || "Error desconocido"));
-                }.bind(this));
+        onEditAssignment: function(oEvent) {
+            var oButton = oEvent.getSource();
+            var oContext = oButton.getBindingContext();
+            var sDependentId = oContext.getProperty("dependentId");
+            this.getOwnerComponent().getRouter().navTo("RouteEditAssignment", {
+                dependentId: encodeURIComponent(sDependentId)
+            });
         },
 
         onRefresh: function() {

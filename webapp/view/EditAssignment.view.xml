@@ -1,21 +1,17 @@
 <mvc:View
-    controllerName="com.ccb.quota.controller.QuotaAssignment"
+    controllerName="com.ccb.quota.controller.EditAssignment"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:l="sap.ui.layout"
     xmlns:core="sap.ui.core">
 
     <Page
-        id="quotaAssignmentPage"
-        title="{i18n>quotaAssignmentTitle}"
-        showNavButton="false">
+        id="editAssignmentPage"
+        title="{i18n>editAssignmentTitle}"
+        showNavButton="true"
+        navButtonPress=".onNavBack">
 
         <headerContent>
-            <Button
-                id="myAssignmentsButton"
-                icon="sap-icon://calendar"
-                text="{i18n>myAssignments}"
-                press=".onNavigateToMyAssignments" />
             <Button
                 id="refreshButton"
                 icon="sap-icon://refresh"
@@ -32,7 +28,7 @@
         <content>
             <VBox class="sapUiSmallMargin quotaContentContainer">
 
-                <!-- Week Selection -->
+                <!-- Week Title -->
                 <l:HorizontalLayout class="sapUiSmallMarginBottom quotaWeekSelector">
                     <Title
                         text="{/currentWeekLabel}"
@@ -40,25 +36,14 @@
                         level="H4" />
                 </l:HorizontalLayout>
 
-                <!-- Info Message for No Children -->
-                <MessageStrip
-                    visible="{= !${/hasChildren}}"
-                    text="{/noChildrenMessage}"
-                    type="Information"
-                    showIcon="true"
-                    class="sapUiMediumMarginBottom">
-                </MessageStrip>
-
                 <!-- Info Text -->
                 <Text
-                    visible="{= ${/hasChildren}}"
-                    text="Seleccione los días de la semana para los cuales requiere el cupo."
+                    text="Modifique los días de la semana para los cuales requiere el cupo. Los días marcados ya tienen reserva activa."
                     class="quotaInfoText sapUiSmallMarginBottom" />
 
-                <!-- Quota Table -->
+                <!-- Edit Table -->
                 <Table
-                    id="quotaTable"
-                    visible="{= ${/hasChildren}}"
+                    id="editTable"
                     items="{/children}"
                     mode="None"
                     class="quotaTable sapUiSmallMarginTop">
@@ -133,7 +118,7 @@
                                         selected="{days/0/selected}"
                                         enabled="{
                                             parts: ['days/0/available', 'days/0/alreadyAssigned'],
-                                            formatter: '.formatter.isDaySelectableSimple'
+                                            formatter: '.formatter.isDayEditableSimple'
                                         }"
                                         select=".onDaySelectedInTable"
                                         class="quotaDayCheckbox">
@@ -149,7 +134,7 @@
                                         selected="{days/1/selected}"
                                         enabled="{
                                             parts: ['days/1/available', 'days/1/alreadyAssigned'],
-                                            formatter: '.formatter.isDaySelectableSimple'
+                                            formatter: '.formatter.isDayEditableSimple'
                                         }"
                                         select=".onDaySelectedInTable"
                                         class="quotaDayCheckbox">
@@ -165,7 +150,7 @@
                                         selected="{days/2/selected}"
                                         enabled="{
                                             parts: ['days/2/available', 'days/2/alreadyAssigned'],
-                                            formatter: '.formatter.isDaySelectableSimple'
+                                            formatter: '.formatter.isDayEditableSimple'
                                         }"
                                         select=".onDaySelectedInTable"
                                         class="quotaDayCheckbox">
@@ -181,7 +166,7 @@
                                         selected="{days/3/selected}"
                                         enabled="{
                                             parts: ['days/3/available', 'days/3/alreadyAssigned'],
-                                            formatter: '.formatter.isDaySelectableSimple'
+                                            formatter: '.formatter.isDayEditableSimple'
                                         }"
                                         select=".onDaySelectedInTable"
                                         class="quotaDayCheckbox">
@@ -197,7 +182,7 @@
                                         selected="{days/4/selected}"
                                         enabled="{
                                             parts: ['days/4/available', 'days/4/alreadyAssigned'],
-                                            formatter: '.formatter.isDaySelectableSimple'
+                                            formatter: '.formatter.isDayEditableSimple'
                                         }"
                                         select=".onDaySelectedInTable"
                                         class="quotaDayCheckbox">
@@ -211,8 +196,8 @@
                     </items>
                 </Table>
 
-                <!-- Checkboxes for Terms (obligatorios) -->
-                <VBox visible="{= ${/hasChildren}}" class="quotaTermsContainer sapUiMediumMarginTop">
+                <!-- Terms Checkboxes (obligatorios) -->
+                <VBox class="quotaTermsContainer sapUiMediumMarginTop">
                     <HBox alignItems="Center" class="quotaTermsRow">
                         <CheckBox
                             id="termsCheckbox"
@@ -240,21 +225,20 @@
 
                 <!-- Action Buttons -->
                 <HBox
-                    visible="{= ${/hasChildren}}"
                     justifyContent="End"
                     class="quotaActionButtons sapUiMediumMarginTop">
                     <Button
                         id="cancelButton"
                         text="Cancelar"
-                        press=".onCancel"
+                        press=".onNavBack"
                         type="Default"
                         class="sapUiSmallMarginEnd" />
                     <Button
                         id="saveButton"
                         text="Aceptar"
-                        press=".onSaveAssignments"
+                        press=".onSaveChanges"
                         type="Emphasized"
-                        enabled="{= ${/selectedCount} > 0 &amp;&amp; ${/termsAccepted} &amp;&amp; ${/privacyAccepted}}" />
+                        enabled="{= ${/termsAccepted} &amp;&amp; ${/privacyAccepted}}" />
                 </HBox>
 
             </VBox>

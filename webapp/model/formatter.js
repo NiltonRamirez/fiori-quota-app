@@ -132,6 +132,13 @@ sap.ui.define([
         },
 
         /**
+         * Check if day is editable in edit mode (allows toggling assigned days)
+         */
+        isDayEditableSimple: function(bAvailable, bAlreadyAssigned) {
+            return bAvailable || bAlreadyAssigned;
+        },
+
+        /**
          * Get status icon
          */
         getStatusIcon: function(bAlreadyAssigned, sDisabledReason) {

@@ -20,7 +20,9 @@ sap.ui.define([
                 selectedCount: 0,
                 currentWeekStart: null,
                 currentWeekLabel: "",
-                noChildrenMessage: ""
+                noChildrenMessage: "",
+                termsAccepted: false,
+                privacyAccepted: false
             });
             this.getView().setModel(oViewModel);
 
@@ -163,6 +165,8 @@ sap.ui.define([
                         oViewModel.setProperty("/children", oData.children);
                         oViewModel.setProperty("/employeeId", oData.employeeId);
                         oViewModel.setProperty("/weekDays", aWeekDays);
+                        oViewModel.setProperty("/termsAccepted", false);
+                        oViewModel.setProperty("/privacyAccepted", false);
                         
                         console.log("✅ Data set in model. HasChildren:", oViewModel.getProperty("/hasChildren"));
                         console.log("✅ Children count:", oViewModel.getProperty("/children").length);
@@ -235,8 +239,30 @@ sap.ui.define([
             }
         },
 
+        onSelectAllForChild: function(oEvent) {
+            var oCheckBox = oEvent.getSource();
+            var bSelected = oCheckBox.getSelected();
+            var oContext = oCheckBox.getBindingContext();
+
+            if (!oContext) {
+                return;
+            }
+
+            var sPath = oContext.getPath();
+            var oViewModel = this.getView().getModel();
+            var oChild = oViewModel.getProperty(sPath);
+
+            oChild.days.forEach(function(oDay, iIndex) {
+                if ((oDay.available || oDay.disabledReason === "NO_QUOTA") && !oDay.alreadyAssigned) {
+                    oViewModel.setProperty(sPath + "/days/" + iIndex + "/selected", bSelected);
+                }
+            });
+
+            this._updateSelectedCount();
+        },
+
         onCancel: function() {
-            // Clear all selections
+            // Clear all selections and reset terms
             var oViewModel = this.getView().getModel();
             var aChildren = oViewModel.getProperty("/children") || [];
 
@@ -247,8 +273,10 @@ sap.ui.define([
             });
 
             oViewModel.setProperty("/children", aChildren);
+            oViewModel.setProperty("/termsAccepted", false);
+            oViewModel.setProperty("/privacyAccepted", false);
             this._updateSelectedCount();
-            
+
             MessageToast.show("Selecciones canceladas");
         },
 

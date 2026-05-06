@@ -4,13 +4,13 @@
     xmlns="sap.m"
     xmlns:l="sap.ui.layout"
     xmlns:core="sap.ui.core">
-    
+
     <Page
         id="myAssignmentsPage"
         title="{i18n>myAssignmentsTitle}"
         showNavButton="true"
         navButtonPress=".onNavBack">
-        
+
         <headerContent>
             <Button
                 id="refreshAssignmentsButton"
@@ -27,8 +27,8 @@
 
         <content>
             <VBox class="sapUiSmallMargin quotaContentContainer">
-                
-                <!-- Week Title (Fixed) -->
+
+                <!-- Week Title -->
                 <l:HorizontalLayout class="sapUiSmallMarginBottom quotaWeekSelector">
                     <Title
                         text="{/currentWeekLabel}"
@@ -38,75 +38,60 @@
 
                 <!-- Info Message when no assignments -->
                 <MessageStrip
-                    visible="{= ${/assignments}.length === 0}"
+                    visible="{= ${/childrenAssignments}.length === 0}"
                     text="No hay asignaciones para esta semana"
                     type="Information"
                     showIcon="true"
                     class="sapUiMediumMarginBottom">
                 </MessageStrip>
 
-                <!-- Assignments Table -->
+                <!-- Assignments Table (grouped by child) -->
                 <Table
                     id="assignmentsTable"
-                    items="{/assignments}"
-                    mode="MultiSelect"
-                    growing="true"
-                    growingThreshold="20"
-                    sticky="ColumnHeaders"
-                    visible="{= ${/assignments}.length > 0}"
+                    items="{/childrenAssignments}"
+                    mode="None"
+                    visible="{= ${/childrenAssignments}.length > 0}"
                     class="quotaAssignmentsTable">
-                    
+
                     <headerToolbar>
                         <OverflowToolbar>
                             <Title text="Lista de Asignaciones" level="H4" />
-                            <ToolbarSpacer />
-                            <Button
-                                id="cancelButton"
-                                text="Cancelar Seleccionados"
-                                type="Reject"
-                                press=".onCancelSelected" />
                         </OverflowToolbar>
                     </headerToolbar>
 
                     <columns>
-                        <Column width="auto">
-                            <Text text="Fecha" />
-                        </Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true">
-                            <Text text="Día" />
-                        </Column>
-                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
+                        <Column width="auto" hAlign="Begin">
                             <Text text="Nombre Dependiente" />
                         </Column>
-                        <Column minScreenWidth="Desktop" demandPopin="true" hAlign="Center">
+                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Begin">
+                            <Text text="Días Reservados" />
+                        </Column>
+                        <Column minScreenWidth="Tablet" demandPopin="true" hAlign="Center">
                             <Text text="Estado" />
+                        </Column>
+                        <Column hAlign="Center">
+                            <Text text="Acción" />
                         </Column>
                     </columns>
 
                     <items>
-                        <ColumnListItem type="Active">
+                        <ColumnListItem>
                             <cells>
-                                <ObjectIdentifier
-                                    title="{
-                                        path: 'date',
-                                        formatter: '.formatter.formatDate'
-                                    }"
-                                    text="{dependentId}" />
-                                <Text
-                                    text="{
-                                        path: 'dayOfWeek',
-                                        formatter: '.formatter.formatDayOfWeek'
-                                    }" />
                                 <Text text="{fullName}" />
+                                <Text text="{daysText}" />
                                 <ObjectStatus
                                     text="{
-                                        path: 'assignmentStatus',
+                                        path: 'overallStatus',
                                         formatter: '.formatter.formatAssignmentStatus'
                                     }"
                                     state="{
-                                        path: 'assignmentStatus',
+                                        path: 'overallStatus',
                                         formatter: '.formatter.getAssignmentStatusState'
                                     }" />
+                                <Button
+                                    text="Editar reserva"
+                                    type="Default"
+                                    press=".onEditAssignment" />
                             </cells>
                         </ColumnListItem>
                     </items>
@@ -114,13 +99,6 @@
 
             </VBox>
         </content>
-
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Text text="Total de asignaciones: {= ${/assignments}.length }" />
-            </Toolbar>
-        </footer>
 
     </Page>
 </mvc:View>
